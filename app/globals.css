@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  /* Nền mặc định toàn site — xem docs/design-system.md mục 2.1 */
+  background-color: #fbf8f6;
+}
+
+@layer components {
+  /* Label nhỏ chữ hoa lặp lại đầu mỗi section — xem docs/design-system.md mục 4 */
+  .section-label {
+    @apply text-xs font-medium uppercase tracking-label text-brown-600;
+  }
+}
