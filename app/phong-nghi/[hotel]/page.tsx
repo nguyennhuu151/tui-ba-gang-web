@@ -8,15 +8,16 @@ import { properties, getPropertyBySlug } from "@/lib/content/properties";
 import { getRoomsByHotel } from "@/lib/content/rooms";
 
 interface Props {
-  params: { hotel: string };
+  params: Promise<{ hotel: string }>;
 }
 
 export function generateStaticParams() {
   return properties.map((p) => ({ hotel: p.slug }));
 }
 
-export function generateMetadata({ params }: Props): Metadata {
-  const property = getPropertyBySlug(params.hotel);
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { hotel } = await params;
+  const property = getPropertyBySlug(hotel);
   if (!property) return {};
   return {
     title: `Phòng nghỉ ${property.shortName} | Túi Ba Gang`,
@@ -31,8 +32,9 @@ export function generateMetadata({ params }: Props): Metadata {
  * Bố cục Hero khớp mockup: label nhỏ "TÚI BA GANG {CƠ SỞ}" phía trên, heading lớn
  * "Phòng nghỉ", mô tả ngắn của cơ sở, và logo nhỏ ở góc dưới-phải ảnh.
  */
-export default function RoomListPage({ params }: Props) {
-  const property = getPropertyBySlug(params.hotel);
+export default async function RoomListPage({ params }: Props) {
+  const { hotel } = await params;
+  const property = getPropertyBySlug(hotel);
   if (!property) {
     notFound();
   }

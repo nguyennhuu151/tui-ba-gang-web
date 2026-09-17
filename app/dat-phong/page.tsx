@@ -13,11 +13,12 @@ export const metadata: Metadata = {
  * docs/page-specifications.md mục 8). Phase 6 chỉ dựng Thanh tìm phòng + khu vực
  * kết quả MOCK, KHÔNG implement luồng thanh toán/thông tin khách (chưa có căn cứ).
  */
-export default function BookingPage({
+export default async function BookingPage({
   searchParams,
 }: {
-  searchParams: { hotel?: string; room?: string };
+  searchParams: Promise<{ hotel?: string; room?: string }>;
 }) {
+  const resolvedSearchParams = await searchParams;
   return (
     <>
       <Hero
@@ -28,7 +29,7 @@ export default function BookingPage({
         imageAlt="Đặt phòng Túi Ba Gang"
       />
       <section className="pb-20 md:pb-28">
-        <BookingPageContent initialLocation={searchParams.hotel ?? "all"} />
+        <BookingPageContent initialLocation={resolvedSearchParams.hotel ?? "all"} />
       </section>
     </>
   );

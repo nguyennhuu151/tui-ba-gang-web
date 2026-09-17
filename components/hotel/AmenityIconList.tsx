@@ -1,3 +1,4 @@
+import type { ReactElement } from "react";
 import type { AmenityItem } from "@/lib/types";
 
 /**
@@ -10,7 +11,7 @@ import type { AmenityItem } from "@/lib/types";
  * - `title` có giá trị → icon tròn + tiêu đề + mô tả (Central, Little Bay).
  * - Ngược lại → icon + nhãn ngắn, dùng `dark` khi nằm trên nền tối (Ember Style).
  */
-const ICONS: Record<AmenityItem["icon"], JSX.Element> = {
+const ICONS: Record<AmenityItem["icon"], ReactElement> = {
   wifi: (
     <path d="M2 7.5a10 10 0 0 1 14 0M4.6 10a6.4 6.4 0 0 1 8.8 0M7.2 12.6a2.8 2.8 0 0 1 3.6 0M9 15h.01" strokeLinecap="round" strokeLinejoin="round" />
   ),

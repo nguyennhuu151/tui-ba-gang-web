@@ -61,12 +61,15 @@ const CONTACT_IMAGES: Record<string, string> = {
  * trước đó thiếu hoàn toàn — đã thêm, xem ghi chú trong `lib/content/contact.ts` về lý
  * do dùng lại ảnh núi đồi sương mù có sẵn thay vì trích ảnh có chữ nhúng sẵn từ PDF.
  */
-export default function ContactPage({
+export default async function ContactPage({
   searchParams,
 }: {
-  searchParams: { offer?: string };
+  searchParams: Promise<{ offer?: string }>;
 }) {
-  const offerFromQuery = searchParams.offer ? offers.find((o) => o.slug === searchParams.offer) : undefined;
+  const resolvedSearchParams = await searchParams;
+  const offerFromQuery = resolvedSearchParams.offer
+    ? offers.find((o) => o.slug === resolvedSearchParams.offer)
+    : undefined;
   const { banner, cards, finalSection } = contactContent;
 
   return (

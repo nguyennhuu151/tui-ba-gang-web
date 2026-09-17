@@ -8,15 +8,16 @@ import { getPropertyBySlug } from "@/lib/content/properties";
 import { rooms, getRoom } from "@/lib/content/rooms";
 
 interface Props {
-  params: { hotel: string; room: string };
+  params: Promise<{ hotel: string; room: string }>;
 }
 
 export function generateStaticParams() {
   return rooms.map((r) => ({ hotel: r.hotel, room: r.slug }));
 }
 
-export function generateMetadata({ params }: Props): Metadata {
-  const room = getRoom(params.hotel, params.room);
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { hotel, room: roomSlug } = await params;
+  const room = getRoom(hotel, roomSlug);
   if (!room) return {};
   return {
     title: `${room.name} | Túi Ba Gang`,
@@ -29,9 +30,10 @@ export function generateMetadata({ params }: Props): Metadata {
  * xem docs/page-specifications.md mục 3b). Giá và tiện nghi chi tiết
  * [CHƯA XÁC ĐỊNH] — dùng mock ở lib/content/rooms.ts.
  */
-export default function RoomDetailPage({ params }: Props) {
-  const property = getPropertyBySlug(params.hotel);
-  const room = getRoom(params.hotel, params.room);
+export default async function RoomDetailPage({ params }: Props) {
+  const { hotel, room: roomSlug } = await params;
+  const property = getPropertyBySlug(hotel);
+  const room = getRoom(hotel, roomSlug);
 
   if (!property || !room) {
     notFound();

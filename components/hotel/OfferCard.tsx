@@ -1,3 +1,4 @@
+import type { ReactElement } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { CornerTagList } from "@/components/ui/CornerTagList";
@@ -68,7 +69,7 @@ export function OfferCard({ offer }: { offer: Offer }) {
   );
 }
 
-const BENEFIT_ICONS: Record<OfferBenefit["icon"], JSX.Element> = {
+const BENEFIT_ICONS: Record<OfferBenefit["icon"], ReactElement> = {
   bed: (
     <path d="M2 12.5V6a1 1 0 0 1 1-1h2.5a1 1 0 0 1 1 1v2.5h5V6a1 1 0 0 1 1-1H15a1 1 0 0 1 1 1v6.5M2 10.5h14M2 12.5v-1M16 12.5v-1" strokeLinecap="round" strokeLinejoin="round" />
   ),

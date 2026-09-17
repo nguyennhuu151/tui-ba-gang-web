@@ -11,15 +11,16 @@ import { properties, getPropertyBySlug } from "@/lib/content/properties";
 import { getRoomsByHotel } from "@/lib/content/rooms";
 
 interface Props {
-  params: { hotel: string };
+  params: Promise<{ hotel: string }>;
 }
 
 export function generateStaticParams() {
   return properties.map((p) => ({ hotel: p.slug }));
 }
 
-export function generateMetadata({ params }: Props): Metadata {
-  const property = getPropertyBySlug(params.hotel);
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { hotel } = await params;
+  const property = getPropertyBySlug(hotel);
   if (!property) return {};
   return {
     title: `${property.fullName} | Túi Ba Gang`,
@@ -46,8 +47,9 @@ export function generateMetadata({ params }: Props): Metadata {
  * Dùng `notFound()` cho slug không hợp lệ — đây là "error state" theo idiom chuẩn
  * của Next.js App Router (hiển thị `app/not-found.tsx`).
  */
-export default function PropertyLandingPage({ params }: Props) {
-  const property = getPropertyBySlug(params.hotel);
+export default async function PropertyLandingPage({ params }: Props) {
+  const { hotel } = await params;
+  const property = getPropertyBySlug(hotel);
   if (!property) {
     notFound();
   }
