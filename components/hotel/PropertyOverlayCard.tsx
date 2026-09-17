@@ -62,25 +62,36 @@ export function PropertyOverlayCard({
         </div>
       )}
 
-      {/* Bug fix (thay Phase 6.8 mục 3): tag góc dưới-phải và khối chữ/nút trước đây đặt
-          CẠNH NHAU (2 cột `absolute` riêng, giới hạn max-w %) nên ở thẻ hẹp (lưới 3 cột,
-          tablet ~213-299px) dễ chồng chữ nếu ctaLabel dài — cách sửa cũ là ẨN hẳn tag dưới
-          `xl`, làm mất nội dung ở phần lớn viewport. Đổi sang xếp CHỒNG THEO CHIỀU DỌC (tag
-          ở trên, khối chữ/nút ở dưới, cùng 1 cột `flex-col` full-width, cách nhau `gap-3`
-          cố định) — không còn cạnh tranh chiều ngang nên không chồng nhau ở bất kỳ kích
-          thước nào, tag luôn hiển thị đầy đủ thay vì bị ẩn. */}
-      <div className="absolute inset-x-0 bottom-0 flex flex-col gap-3 p-5 md:p-6">
-        <CornerTagList lines={tags} className="text-right" />
-        <div className="flex flex-col items-start gap-1">
-          <p className="text-xs uppercase tracking-label text-cream-50/80">TÚI BA GANG</p>
-          <h3 className="font-heading text-2xl text-cream-50">{property.shortName}</h3>
-          {showNumber && <span className="my-1 block h-px w-6 bg-cream-50/50" />}
-          <p className="max-w-full text-sm text-cream-50/85">{description ?? property.cardDescription}</p>
-          <div className="mt-3">
-            <Button href={ctaHref ?? `/thu-vien/${property.slug}`} variant="outline" inverse size="sm">
-              {ctaLabel}
-            </Button>
-          </div>
+      {/* Phase 6.8 mục 3 (bug fix, phát hiện khi dựng lại tĩnh bằng Playwright để kiểm
+          thử responsive mục 9): ở lưới 3 cột (`grid md:grid-cols-3`), mỗi thẻ chỉ rộng
+          ~213-299px tại 768-1024px (tablet) — không đủ chỗ cho tag 3 dòng CÙNG LÚC với
+          nút có nhãn dài (vd. "XEM THƯ VIỆN EMBER STYLE") mà không chồng lên nhau, dù đã
+          nới cột/`size="sm"`. Đổi ngưỡng hiện tag từ `md:` sang `xl:` (chỉ hiện khi thẻ
+          đã đủ rộng ~384px, tương đương desktop trong File B) — ưu tiên nút CTA (chức
+          năng chính) luôn đọc được, rõ ràng ở MỌI viewport thay vì giữ tag trang trí
+          bằng mọi giá rồi bị chồng chữ. */}
+      <CornerTagList
+        lines={tags}
+        className="absolute bottom-5 right-5 hidden max-w-[42%] text-right xl:block xl:bottom-6 xl:right-6"
+      />
+
+      {/* Phase 6.6 mục 3.2 + Phase 6.8 mục 3 (bug fix bổ sung): khối chữ/nút giới hạn
+          max-w để không lấn sang cột `tags` góc dưới-phải khi ctaLabel dài (vd. "XEM THƯ
+          VIỆN EMBER STYLE") — kết hợp Button `size="sm"`. Phase 6.8: tag dài nhất
+          ("A DIFFERENT YOU" — Little Bay) bị xuống dòng giữa chừng trong cột 30% cũ vì
+          không đủ chỗ; đã nới cột tag lên 42% (đủ cho tag dài nhất luôn 1 dòng, xem
+          `CornerTagList` tự thêm `whitespace-nowrap`) và giảm tương ứng cột tên/nút
+          xuống 55%/58% để 2 cột vẫn không chồng nhau (tổng ~97%, còn khoảng hở nhỏ giữa
+          2 cột đúng như trước). */}
+      <div className="absolute inset-x-0 bottom-0 flex max-w-[55%] flex-col items-start gap-1 p-5 md:max-w-[58%] md:p-6">
+        <p className="text-xs uppercase tracking-label text-cream-50/80">TÚI BA GANG</p>
+        <h3 className="font-heading text-2xl text-cream-50">{property.shortName}</h3>
+        {showNumber && <span className="my-1 block h-px w-6 bg-cream-50/50" />}
+        <p className="max-w-full text-sm text-cream-50/85">{description ?? property.cardDescription}</p>
+        <div className="mt-3">
+          <Button href={ctaHref ?? `/thu-vien/${property.slug}`} variant="outline" inverse size="sm">
+            {ctaLabel}
+          </Button>
         </div>
       </div>
     </motion.article>
