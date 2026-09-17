@@ -54,7 +54,21 @@ export default async function PropertyLandingPage({ params }: Props) {
     notFound();
   }
 
-  const previewRooms = getRoomsByHotel(property.slug).slice(0, property.roomsSection?.previewCount ?? 3);
+  // Bug fix (chỉ áp dụng preview phòng ở trang Central — KHÔNG đụng `lib/content/rooms.ts`
+  // dùng chung cho cả trang chi tiết `/phong-nghi/central/:room`): ảnh mặc định của
+  // "Superior Room"/"Deluxe Window" (`room-central-superior-room-1.jpg`,
+  // `room-central-deluxe-window-1.jpg`) chỉ 370×207px, chất lượng thấp/mờ khi hiển thị.
+  // Bộ ảnh `room-central-deluxe-plus-*.jpg` (990×680px) đã có sẵn, chất lượng cao hơn
+  // hẳn — dùng tạm cho riêng dải preview 3 phòng ở trang này (không đổi ảnh thật của
+  // từng hạng phòng ở trang chi tiết, tránh sai lệch thông tin phòng).
+  const previewRoomsRaw = getRoomsByHotel(property.slug).slice(0, property.roomsSection?.previewCount ?? 3);
+  const previewRooms =
+    property.slug === "central"
+      ? previewRoomsRaw.map((room, index) => ({
+          ...room,
+          images: [`/images/room-central-deluxe-plus-${(index % 2) + 1}.jpg`],
+        }))
+      : previewRoomsRaw;
   const introAnchor = `story-${property.slug}`;
   const isDarkAmenities = Boolean(property.amenitiesSection.dark);
 
@@ -292,7 +306,11 @@ export default async function PropertyLandingPage({ params }: Props) {
                 {property.roomsSection.heading}
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-brown-600">{property.roomsSection.subheading}</p>
-              <div className="mt-4">
+              {/* Bug fix: `mt-4` (16px) đặt nút quá cao so với tên hạng phòng bên cạnh
+                  (2 khối chữ khác cỡ font/line-height nên không tự khớp hàng) — đo trực
+                  tiếp bằng browser rồi bù thêm đúng phần chênh lệch để nút NGANG HÀNG
+                  với tên hạng phòng. */}
+              <div className="mt-8">
                 <Button href={`/phong-nghi/${property.slug}`} variant="ghost">
                   {property.roomsSection.ctaLabel}
                 </Button>
@@ -347,20 +365,32 @@ export default async function PropertyLandingPage({ params }: Props) {
         cột thứ 3 (ảnh vuông nhỏ + caption viết tay đè lên ảnh + đoạn mô tả nhỏ bên dưới)
         và nút "Khám phá ẩm thực" còn thiếu ở bản cũ. Bố cục 3 cột: ảnh lớn ngang | chữ |
         ảnh vuông nhỏ + mô tả — đúng thứ tự trái→phải của tham chiếu.
+
+        Bug fix (đối chiếu lại ảnh nhúng File B trang 6): section này thiếu nền be bao
+        trọn cả section (chỉ có `pb-*`, nền trắng mặc định của trang) nên trông "dàn
+        trải" tách rời so với tham chiếu — đã thêm `bg-cream-200 py-16 md:py-20` (cùng
+        token nền be đã dùng cho section Tiện nghi ở trên) và giảm `gap`/kích thước ảnh
+        để 3 khối gọn, sát nhau hơn, đúng tỉ lệ tham chiếu.
       */}
       {property.dining && (
-        <section className="pb-20 md:pb-28">
-          <Container className="grid gap-8 md:grid-cols-[1.2fr_1fr_0.8fr] md:items-center">
-            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg">
+        <section className="bg-cream-200 py-16 md:py-20">
+          {/* Bug fix (đối chiếu ảnh nhúng File B trang 6): `grid md:grid-cols-[1.2fr_1fr_0.8fr]`
+              chia 3 cột theo TỈ LỆ của container 1280px, nên cột chữ (chỉ 1 câu ngắn) chiếm
+              cả 1 cột rộng ~390px nhưng chữ không lấp đầy — để lại khoảng trắng lớn giữa 3
+              khối, đúng cảm giác "dàn trải" client mô tả. Đổi sang `flex` với từng khối có
+              chiều rộng CỐ ĐỊNH vừa đúng nội dung (không co giãn theo container) — 3 khối tự
+              nằm sát nhau, gọn như tham chiếu, thay vì bị grid kéo giãn. */}
+          <Container className="flex flex-col gap-8 md:flex-row md:items-center">
+            <div className="relative aspect-[3/2] w-full overflow-hidden rounded-lg md:w-[380px] md:shrink-0">
               <Image
                 src={property.dining.image}
                 alt={property.dining.title}
                 fill
-                sizes="(min-width: 768px) 35vw, 100vw"
+                sizes="(min-width: 768px) 380px, 100vw"
                 className="object-cover"
               />
             </div>
-            <div>
+            <div className="md:max-w-xs">
               <SectionLabel>{property.dining.label}</SectionLabel>
               <h3 className="mt-3 font-heading text-2xl text-ink md:text-3xl">{property.dining.title}</h3>
               <p className="mt-4 text-sm leading-relaxed text-brown-600">{property.dining.description}</p>
@@ -376,13 +406,13 @@ export default async function PropertyLandingPage({ params }: Props) {
               )}
             </div>
             {property.dining.secondaryImage && (
-              <div>
-                <div className="relative aspect-square w-full max-w-[220px] overflow-hidden rounded-lg md:max-w-none">
+              <div className="md:w-[180px] md:shrink-0">
+                <div className="relative aspect-square w-full max-w-[180px] overflow-hidden rounded-lg md:max-w-none">
                   <Image
                     src={property.dining.secondaryImage}
                     alt={`${property.dining.title} — cận cảnh`}
                     fill
-                    sizes="(min-width: 768px) 20vw, 45vw"
+                    sizes="(min-width: 768px) 180px, 45vw"
                     className="object-cover"
                   />
                   {property.dining.secondaryCaption && property.dining.secondaryCaption.length > 0 && (
