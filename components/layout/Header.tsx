@@ -102,7 +102,11 @@ export function Header() {
   const inverse = hasHero && !scrolledPastHero;
 
   return (
-    <header className="fixed inset-x-0 top-0 z-30 bg-transparent">
+    <header
+      className={`fixed inset-x-0 top-0 z-30 border bg-transparent transition-colors ${
+        inverse ? "border-cream-50/40" : "border-ink/15"
+      }`}
+    >
       <Container className="flex h-20 items-center justify-between md:h-24">
         <Logo inverse={inverse} />
         <NavMenu inverse={inverse} />
