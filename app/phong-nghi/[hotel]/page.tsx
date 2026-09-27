@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { Hero } from "@/components/hero/Hero";
 import { Logo } from "@/components/layout/Logo";
 import { Container } from "@/components/layout/Container";
+import { Breadcrumb } from "@/components/navigation/Breadcrumb";
+import { ComingSoonScreen } from "@/components/ui/ComingSoonScreen";
 import { RoomListWithFilter } from "@/components/room/RoomListWithFilter";
 import { properties, getPropertyBySlug } from "@/lib/content/properties";
 import { getRoomsByHotel } from "@/lib/content/rooms";
@@ -39,6 +41,16 @@ export default async function RoomListPage({ params }: Props) {
     notFound();
   }
 
+  if (["ember-style", "little-bay"].includes(hotel)) {
+    return (
+      <section className="flex min-h-screen items-center bg-cream-50 pt-32 pb-16 md:pt-40 md:pb-24">
+        <Container className="w-full">
+          <ComingSoonScreen hotel={hotel} />
+        </Container>
+      </section>
+    );
+  }
+
   const rooms = getRoomsByHotel(property.slug);
 
   return (
@@ -54,7 +66,16 @@ export default async function RoomListPage({ params }: Props) {
       />
       <section className="py-16 md:py-20">
         <Container>
-          <RoomListWithFilter rooms={rooms} />
+          <Breadcrumb
+            items={[
+              { label: "Trang chủ", href: "/" },
+              { label: "Phòng nghỉ", href: "/phong-nghi" },
+              { label: property.shortName },
+            ]}
+          />
+          <div className="mt-8">
+            <RoomListWithFilter rooms={rooms} />
+          </div>
         </Container>
       </section>
     </>
