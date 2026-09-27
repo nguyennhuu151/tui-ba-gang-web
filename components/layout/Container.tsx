@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactNode, JSX } from "react";
 
 /**
  * Container — giới hạn max-width nội dung chính (~1280px), căn giữa.
@@ -11,7 +11,7 @@ export function Container({
 }: {
   children: ReactNode;
   className?: string;
-}) {
+}): JSX.Element {
   return (
     <div className={`mx-auto w-full max-w-container px-6 md:px-10 ${className}`}>{children}</div>
   );

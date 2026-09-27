@@ -1,0 +1,9 @@
+{
+  // Luôn đọc .tsx là TypeScript React (có JSX) — tránh IDE báo lỗi đỏ giả khi file bị nhận nhầm là TypeScript thường.
+  "files.associations": {
+    "*.tsx": "typescriptreact"
+  },
+  // Dùng đúng phiên bản TypeScript của project (node_modules) thay vì bản đi kèm VS Code.
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true
+}

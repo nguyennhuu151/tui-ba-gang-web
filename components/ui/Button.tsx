@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
+import type { ReactNode, JSX } from "react";
 
 /**
  * Button — component nguyên tử dùng lại nhiều nhất toàn site.
@@ -105,7 +105,7 @@ interface ButtonAsButtonProps extends BaseButtonProps {
 
 export type ButtonProps = ButtonAsLinkProps | ButtonAsButtonProps;
 
-export function Button(props: ButtonProps) {
+export function Button(props: ButtonProps): JSX.Element {
   const {
     children,
     variant = "primary",

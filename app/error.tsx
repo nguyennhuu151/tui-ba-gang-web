@@ -4,19 +4,14 @@ import { useEffect } from "react";
 import { Container } from "@/components/layout/Container";
 import { Button } from "@/components/ui/Button";
 
-/**
- * error.tsx — Error Boundary dùng chung của Next.js App Router (BẮT BUỘC là Client
- * Component). Bắt lỗi runtime không mong muốn ở bất kỳ trang nào trong site.
- */
-export default function GlobalError({
+export default function ErrorPage({
   error,
-  reset,
+  retry,
 }: {
   error: Error & { digest?: string };
-  reset: () => void;
+  retry: () => void;
 }) {
   useEffect(() => {
-    // eslint-disable-next-line no-console -- log tạm thời cho Phase 6, chưa có dịch vụ theo dõi lỗi chính thức
     console.error(error);
   }, [error]);
 
@@ -28,7 +23,7 @@ export default function GlobalError({
         Vui lòng thử lại. Nếu lỗi vẫn tiếp diễn, hãy liên hệ với chúng tôi qua trang Liên hệ.
       </p>
       <div className="mt-2 flex gap-4">
-        <Button onClick={reset}>Thử lại</Button>
+        <Button onClick={() => retry()}>Thử lại</Button>
         <Button href="/" variant="outline">
           Về trang chủ
         </Button>

@@ -75,16 +75,14 @@ export function Header() {
   // khi JS kịp gắn observer.
   const [scrolledPastHero, setScrolledPastHero] = useState(false);
 
+  // Không reset state đồng bộ trong effect (rule react-hooks/set-state-in-effect):
+  // trang không có Hero đã bị loại bởi `hasHero` ở biến `inverse` bên dưới, còn khi
+  // gắn observer mới thì IntersectionObserver luôn gọi callback ngay lần đầu với trạng
+  // thái thật của sentinel, nên giá trị cũ từ route trước tự được ghi đè.
   useEffect(() => {
-    if (!hasHero) {
-      setScrolledPastHero(false);
-      return;
-    }
+    if (!hasHero) return;
     const sentinel = document.getElementById("hero-sentinel");
-    if (!sentinel) {
-      setScrolledPastHero(false);
-      return;
-    }
+    if (!sentinel) return;
     const observer = new IntersectionObserver(([entry]) => setScrolledPastHero(!entry.isIntersecting), {
       // Trừ hao đúng chiều cao Header (dùng số lớn nhất giữa mobile/desktop) — coi như
       // "đã cuộn qua Hero" ngay khi mép dưới Hero chạm mép dưới Header, thay vì phải

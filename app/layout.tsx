@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/footer/Footer";
 import { StickyContactWidget } from "@/components/layout/StickyContactWidget";
+import { isIndexable, siteName, siteUrl } from "@/lib/site";
 
 /**
  * Font setup — xem docs/design-system.md mục 3.
@@ -28,7 +29,7 @@ import { StickyContactWidget } from "@/components/layout/StickyContactWidget";
 const heading = Playfair_Display({
   subsets: ["latin", "vietnamese"],
   weight: ["400", "600", "700"],
-  style: ["normal", "italic"],
+  style: "normal",
   variable: "--font-heading",
   display: "swap",
 });
@@ -40,10 +41,27 @@ const body = Inter({
   display: "swap",
 });
 
+const siteDescription =
+  "Túi Ba Gang – thương hiệu lưu trú tại Đà Lạt với 3 không gian riêng biệt: Central, Ember Style và Little Bay.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "Túi Ba Gang | Ba không gian, một tinh thần",
-  description:
-    "Túi Ba Gang – thương hiệu lưu trú tại Đà Lạt với 3 không gian riêng biệt: Central, Ember Style và Little Bay.",
+  description: siteDescription,
+  applicationName: siteName,
+  openGraph: {
+    type: "website",
+    locale: "vi_VN",
+    siteName,
+    description: siteDescription,
+    images: [{ url: "/images/hero-home.jpg", alt: siteName }],
+  },
+  twitter: { card: "summary_large_image" },
+  robots: isIndexable ? undefined : { index: false, follow: false },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#FBF8F6",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

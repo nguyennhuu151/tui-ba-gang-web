@@ -60,3 +60,12 @@ File `.env.example` này (không chứa giá trị thật) là file **duy nhất
 ---
 
 *Xem thêm: `security.md` (nguyên tắc bảo mật cho các biến này), `api-integration-design.md` (bối cảnh dùng các biến ezCloud).*
+
+## 5. Cập nhật khi chuẩn bị production
+
+| Biến | Loại | Mục đích |
+|---|---|---|
+| `NEXT_PUBLIC_SITE_URL` | Public | Đã dùng trong code (`lib/site.ts`): `metadataBase`, Open Graph, `sitemap.xml`, `robots.txt`. Không đặt thì mặc định `http://localhost:3000` — **bắt buộc đặt trên Production**. |
+| `NEXT_PUBLIC_ZALO_LINK_CENTRAL` | Public | Đã dùng trong `StickyContactWidget`; chưa đặt thì dùng link tạm theo hotline Central. |
+| `SITE_INDEXABLE` | Private | Chỉ dùng khi tự host ngoài Vercel: `true` = cho phép index. Trên Vercel tự xác định theo `VERCEL_ENV`. |
+| `NEXT_PUBLIC_CHATBOT_API_URL` | Public | URL backend chatbot (`chatbot/backend`), dùng trong `components/chat/ChatWidget.tsx` và CSP `connect-src`. Dev để trống = `http://localhost:8080`; Production để trống = ẩn nút chat. |
