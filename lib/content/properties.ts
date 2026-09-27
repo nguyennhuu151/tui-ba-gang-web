@@ -30,6 +30,7 @@ export const properties: Property[] = [
     cardDescription: "Ở giữa Đà Lạt, gần hơn với mọi cuộc hẹn.",
     cardImage: "/images/hotel/exterior/hotel-central-exterior-main.webp",
     heroImage: "/images/thuvien-hero-central.jpg",
+    tags: ["CITY", "PEOPLE", "CONNECTIONS"],
     heroSubheadline: ["Sôi động giữa", "lòng phố."],
     heroDashTag: ["A CITY STAY", "WITH A SOFTER RHYTHM"],
     heroTopRightTag: ["PEOPLE", "PLACES", "MOMENTS", "A SLOWER WAY"],
@@ -39,10 +40,6 @@ export const properties: Property[] = [
       paragraphs: [
         "Túi Ba Gang Central là nơi nhịp sống Đà Lạt hiện đại và sự riêng tư gặp nhau. Nằm ngay trung tâm thành phố, khách sạn mang đến một không gian lưu trú thoải mái, tinh tế và thuận tiện — để bạn dễ dàng khám phá những điều thú vị của Đà Lạt, theo cách riêng của mình.",
       ],
-      // CONFIRMED File B trang 6: 1 ảnh NGANG (quán cà phê/sảnh nhỏ) — xem ghi chú
-      // `story.images` ở lib/types.ts. Ảnh gốc đã đúng nội dung/tỉ lệ ngang sẵn (không
-      // cần thay ảnh) — lỗi Phase 6.8 mục 5.2 ("hiện đang dọc") là do khung CSS ép ảnh
-      // vào tỉ lệ dọc, đã sửa ở app/thu-vien/[hotel]/page.tsx, không phải do ảnh.
       images: ["/images/story-central.jpg"],
       ctaLabel: "TÌM HIỂU CÂU CHUYỆN",
     },
@@ -91,6 +88,11 @@ export const properties: Property[] = [
     },
     // KHÔNG có banner CTA cuối trang — CONFIRMED File B trang 6 kết thúc ngay sau mục
     // Ẩm thực (xem ghi chú ở lib/types.ts `closingBanner`).
+    closingBanner: {
+      tag: ["ĐÀ LẠT", "CENTRAL", "A DEEPER YOU"],
+      subtitle: "Same mountains, a gentler you.",
+      ctaLabel: "ĐẶT PHÒNG NGAY",
+    },
     contact: {
       hotline: "0263 383 7837",
       email: "central@tuibagangdalat.vn",
@@ -109,6 +111,7 @@ export const properties: Property[] = [
     heroSubheadline: ["Ấm áp.", "Tinh tế.", "Năng lượng."],
     heroDashTag: ["A WARMER STAY", "A DEEPER YOU"],
     heroTopRightTag: ["PEOPLE", "PLACES", "MOMENTS", "A WARMER YOU"],
+    tags: ["PEOPLE", "MOMENTS", "A WARMER YOU"],
     story: {
       label: "OUR STORY",
       heading: ["Ngọn lửa của", "những hành trình đẹp hơn."],
@@ -170,17 +173,13 @@ export const properties: Property[] = [
     taglineEn: "Nature · People · A slower way",
     cardDescription: "Bình yên bên hồ, gần gũi thiên nhiên.",
     cardImage: "/images/hotel/interior/hotel-little-bay-living-pool.webp",
-    // Ảnh ngang (2100x910) rộng hơn khung thẻ 4:3 — lệch object-position sang phải
-    // để giữ hồ bơi + view rừng thông (chủ thể chính) thay vì bị cắt mất bởi object-cover mặc định.
     cardImageFocus: "80% center",
     heroImage: "/images/thuvien-hero-little-bay.jpg",
-    // Không có "TÚI BA GANG" phía trên headline (CONFIRMED File B trang 8 — khác Central/
-    // Ember Style) — xem `locationTag` bỏ trống ở app/thu-vien/[hotel]/page.tsx.
     heroHeadline: ["A little bay", "by Túi Ba Gang"],
     heroSubheadline: ["Một vịnh nhỏ ở Đà Lạt", "mang dấu ấn Túi Ba Gang."],
     heroDashTag: ["NATURE · PEOPLE", "A SLOWER WAY"],
     heroTopRightTag: ["SƯƠNG SỚM", "CÂY XANH", "NHỮNG ĐIỀU", "BÌNH YÊN"],
-    // KHÔNG có mục "Our Story" (thay bằng `moodTiles` — CONFIRMED File B trang 8).
+    tags: ["NATURE", "RELAXATION", "A DIFFERENT YOU"],
     moodTiles: [
       {
         key: "sunrise",

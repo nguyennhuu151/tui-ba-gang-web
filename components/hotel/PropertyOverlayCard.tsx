@@ -6,18 +6,6 @@ import { Button } from "@/components/ui/Button";
 import { CornerTagList } from "@/components/ui/CornerTagList";
 import type { Property } from "@/lib/types";
 
-/**
- * PropertyOverlayCard — ảnh cơ sở với tên/mô tả/nút đè TRỰC TIẾP lên ảnh (có lớp
- * gradient tối phía dưới để chữ luôn đọc được), khác với `PropertyCard` (ảnh + khối
- * chữ nền riêng bên dưới ảnh).
- *
- * CONFIRMED dùng ở 2 nơi:
- * - Trang Phòng nghỉ (File B trang 3, Phase 6.5 mục 6.2) — không có `showNumber`/`tags`.
- * - Trang Thư viện (File B trang 5, Phase 6.5 mục 12) — có số 01/02/03 (`showNumber`)
- *   và tag nhỏ 3 dòng góc dưới-phải (`tags`, vd. "CITY / PEOPLE / CONNECTIONS").
- * Component viết RIÊNG (không sửa `PropertyCard` đang dùng ở Trang chủ/Về chúng tôi)
- * vì các nơi đó dùng kiểu hiển thị khác — tránh sửa code không liên quan (CLAUDE.md mục 5).
- */
 export function PropertyOverlayCard({
   property,
   index = 0,
@@ -32,9 +20,7 @@ export function PropertyOverlayCard({
   ctaHref?: string;
   ctaLabel?: string;
   showNumber?: boolean;
-  /** Ghi đè `property.cardDescription` — dùng khi trang cụ thể hiển thị 1 dòng khác (vd. Thư viện) */
   description?: string;
-  /** Tag nhỏ chữ hoa, tối đa vài dòng, đặt góc dưới-phải ảnh (CONFIRMED trang Thư viện) */
   tags?: string[];
 }) {
   return (
@@ -62,37 +48,29 @@ export function PropertyOverlayCard({
         </div>
       )}
 
-      {/* Phase 6.8 mục 3 (bug fix, phát hiện khi dựng lại tĩnh bằng Playwright để kiểm
-          thử responsive mục 9): ở lưới 3 cột (`grid md:grid-cols-3`), mỗi thẻ chỉ rộng
-          ~213-299px tại 768-1024px (tablet) — không đủ chỗ cho tag 3 dòng CÙNG LÚC với
-          nút có nhãn dài (vd. "XEM THƯ VIỆN EMBER STYLE") mà không chồng lên nhau, dù đã
-          nới cột/`size="sm"`. Đổi ngưỡng hiện tag từ `md:` sang `xl:` (chỉ hiện khi thẻ
-          đã đủ rộng ~384px, tương đương desktop trong File B) — ưu tiên nút CTA (chức
-          năng chính) luôn đọc được, rõ ràng ở MỌI viewport thay vì giữ tag trang trí
-          bằng mọi giá rồi bị chồng chữ. */}
-      <CornerTagList
-        lines={tags}
-        className="absolute bottom-5 right-5 hidden max-w-[42%] text-right xl:block xl:bottom-6 xl:right-6"
-      />
-
-      {/* Phase 6.6 mục 3.2 + Phase 6.8 mục 3 (bug fix bổ sung): khối chữ/nút giới hạn
-          max-w để không lấn sang cột `tags` góc dưới-phải khi ctaLabel dài (vd. "XEM THƯ
-          VIỆN EMBER STYLE") — kết hợp Button `size="sm"`. Phase 6.8: tag dài nhất
-          ("A DIFFERENT YOU" — Little Bay) bị xuống dòng giữa chừng trong cột 30% cũ vì
-          không đủ chỗ; đã nới cột tag lên 42% (đủ cho tag dài nhất luôn 1 dòng, xem
-          `CornerTagList` tự thêm `whitespace-nowrap`) và giảm tương ứng cột tên/nút
-          xuống 55%/58% để 2 cột vẫn không chồng nhau (tổng ~97%, còn khoảng hở nhỏ giữa
-          2 cột đúng như trước). */}
-      <div className="absolute inset-x-0 bottom-0 flex max-w-[55%] flex-col items-start gap-1 p-5 md:max-w-[58%] md:p-6">
+      <div className="absolute inset-x-0 bottom-0 flex max-w-[55%] flex-col items-start gap-1 p-5 pb-[calc(100%*0.18+1.25rem)] md:max-w-[58%] md:p-6 md:pb-[calc(100%*0.16+1.5rem)]">
         <p className="text-xs uppercase tracking-label text-cream-50/80">TÚI BA GANG</p>
         <h3 className="font-heading text-2xl text-cream-50">{property.shortName}</h3>
         {showNumber && <span className="my-1 block h-px w-6 bg-cream-50/50" />}
         <p className="max-w-full text-sm text-cream-50/85">{description ?? property.cardDescription}</p>
-        <div className="mt-3">
-          <Button href={ctaHref ?? `/thu-vien/${property.slug}`} variant="outline" inverse size="sm">
-            {ctaLabel}
-          </Button>
-        </div>
+      </div>
+
+      <div className="absolute left-5 right-5 bottom-5 flex w-[calc(100%-2.5rem)] items-end justify-between gap-4 md:left-6 md:right-6 md:bottom-6 md:w-[calc(100%-3rem)]">
+        <Button href={ctaHref ?? `/thu-vien/${property.slug}`} variant="outline" inverse size="sm">
+          {ctaLabel}
+        </Button>
+        {tags && tags.length > 0 && (
+          <ul className="flex max-w-[45%] flex-col gap-[2px]">
+            {tags.slice(0, 3).map((tag) => (
+              <li
+                key={tag}
+                className="whitespace-nowrap text-[9px] uppercase tracking-[0.12em] leading-tight text-cream-50/80 md:text-[10px] md:tracking-[0.13em]"
+              >
+                {tag}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </motion.article>
   );
