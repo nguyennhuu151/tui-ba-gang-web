@@ -29,7 +29,7 @@ import { isIndexable, siteName, siteUrl } from "@/lib/site";
 const heading = Playfair_Display({
   subsets: ["latin", "vietnamese"],
   weight: ["400", "600", "700"],
-  style: ["normal", "italic"],
+  style: "normal",
   variable: "--font-heading",
   display: "swap",
 });
