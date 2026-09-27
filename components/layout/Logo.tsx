@@ -22,13 +22,18 @@ const LOCKUP_ASPECT = { width: 1195, height: 766 };
 export function Logo({
   inverse = false,
   className = "h-12 w-auto md:h-16",
+  href = "/",
+  label = "Về trang chủ Túi Ba Gang",
 }: {
   inverse?: boolean;
+  /** Đích khi bấm logo — mặc định về trang chủ (vd. PropertySubNav trỏ về /thu-vien) */
+  href?: string;
+  label?: string;
   /** Ghi đè kích thước mặc định — vd. dùng bản nhỏ hơn làm badge góc ảnh Hero */
   className?: string;
 }) {
   return (
-    <Link href="/" className="flex items-center" aria-label="Về trang chủ Túi Ba Gang">
+    <Link href={href} className="flex items-center" aria-label={label}>
       <Image
         src={inverse ? "/logo/logo-lockup-inverse.png" : "/logo/logo-lockup.png"}
         alt="Túi Ba Gang"

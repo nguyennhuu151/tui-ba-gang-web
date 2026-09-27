@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Logo } from "@/components/layout/Logo";
 import { Container } from "@/components/layout/Container";
 import { Button } from "@/components/ui/Button";
@@ -18,9 +17,7 @@ export function PropertySubNav({ activeProperty }: { activeProperty: PropertySlu
   return (
     <header className="sticky top-0 z-30 border-b border-cream-200 bg-cream-50/95 backdrop-blur">
       <Container className="flex min-h-20 flex-wrap items-center justify-between gap-4 py-3 md:h-24 md:flex-nowrap md:py-0">
-        <Link href="/thu-vien" aria-label="Về trang Thư viện">
-          <Logo />
-        </Link>
+        <Logo href="/thu-vien" label="Về trang Thư viện" />
         <TabFilter
           activeKey={activeProperty}
           items={properties.map((p) => ({

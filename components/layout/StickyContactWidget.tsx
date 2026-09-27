@@ -1,5 +1,9 @@
+import { ChatWidget } from "@/components/chat/ChatWidget";
+import { chatbotApiUrl } from "@/lib/site";
+
 /**
- * StickyContactWidget — nút nổi Zalo + gọi điện, góc màn hình.
+ * StickyContactWidget — nút nổi Chat trợ lý ảo + Zalo + gọi điện, góc màn hình.
+ * Nút Chat chỉ hiện khi đã cấu hình backend chatbot (xem `chatbotApiUrl` trong lib/site.ts).
  * Xem docs/component-inventory.md và docs/user-flows.md (Flow G).
  *
  * MOCK / PLACEHOLDER cho Phase 5:
@@ -11,12 +15,14 @@
  */
 const HOTLINE = "0263 383 7837";
 const HOTLINE_TEL = "+842633837837";
-// Số Zalo thật / OA ID chính thức chưa được cung cấp — dùng link tạm trỏ theo số hotline.
-const ZALO_LINK = `https://zalo.me/${HOTLINE_TEL}`;
+// Số Zalo thật / OA ID chính thức chưa được cung cấp — đọc từ NEXT_PUBLIC_ZALO_LINK_CENTRAL
+// (xem .env.example), chưa cấu hình thì dùng link tạm trỏ theo số hotline.
+const ZALO_LINK = process.env.NEXT_PUBLIC_ZALO_LINK_CENTRAL || `https://zalo.me/${HOTLINE_TEL}`;
 
 export function StickyContactWidget() {
   return (
     <div className="fixed bottom-6 right-6 z-40 flex flex-col gap-3">
+      {chatbotApiUrl && <ChatWidget />}
       <a
         href={ZALO_LINK}
         target="_blank"
