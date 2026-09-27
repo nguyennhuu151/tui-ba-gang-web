@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Hero } from "@/components/hero/Hero";
+import { Container } from "@/components/layout/Container";
+import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import { BookingPageContent } from "@/components/booking/BookingPageContent";
 
 export const metadata: Metadata = {
@@ -29,7 +31,17 @@ export default async function BookingPage({
         imageAlt="Đặt phòng Túi Ba Gang"
       />
       <section className="pb-20 md:pb-28">
-        <BookingPageContent initialLocation={resolvedSearchParams.hotel ?? "all"} />
+        <Container>
+          <Breadcrumb
+            items={[
+              { label: "Trang chủ", href: "/" },
+              { label: "Đặt phòng" },
+            ]}
+          />
+          <div className="mt-8 md:mt-10">
+            <BookingPageContent initialLocation={resolvedSearchParams.hotel ?? "all"} />
+          </div>
+        </Container>
       </section>
     </>
   );

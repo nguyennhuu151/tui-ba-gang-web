@@ -11,21 +11,34 @@ export interface BreadcrumbItem {
 
 export function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
   return (
-    <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-xs text-brown-600">
+    <nav
+      aria-label="Breadcrumb"
+      className="flex flex-wrap items-center gap-3 py-3 text-sm text-brown-600"
+    >
       {items.map((item, index) => {
         const isLast = index === items.length - 1;
         return (
-          <span key={`${item.label}-${index}`} className="flex items-center gap-2">
+          <span key={`${item.label}-${index}`} className="flex items-center gap-3">
             {item.href && !isLast ? (
-              <Link href={item.href} className="hover:text-ink hover:underline">
+              <Link
+                href={item.href}
+                className="py-1 leading-6 hover:text-ink hover:underline"
+              >
                 {item.label}
               </Link>
             ) : (
-              <span aria-current={isLast ? "page" : undefined} className={isLast ? "text-ink" : ""}>
+              <span
+                aria-current={isLast ? "page" : undefined}
+                className={`py-1 leading-6 ${isLast ? "font-medium text-ink" : ""}`}
+              >
                 {item.label}
               </span>
             )}
-            {!isLast && <span aria-hidden="true">/</span>}
+            {!isLast && (
+              <span aria-hidden="true" className="text-brown-400">
+                /
+              </span>
+            )}
           </span>
         );
       })}

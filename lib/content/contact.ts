@@ -34,16 +34,6 @@ export const contactContent = {
       tags: ["NATURE", "RELAXATION", "A DIFFERENT YOU"],
     },
   },
-  /**
-   * Section cuối trang — CONFIRMED File B trang 10, trước đó bị thiếu hoàn toàn
-   * (Phase 6.6 mục 4.9). Ảnh toàn cảnh núi đồi Đà Lạt trong sương — dùng lại asset
-   * sẵn có `destination/dalat/dalat-lake-church-mist.webp` (đã dùng ở trang Trải
-   * nghiệm) thay vì trích ảnh riêng từ PDF, vì vùng ảnh gốc ở File B trang 10 có
-   * chữ "TÚI BA GANG — ĐÀ LẠT" in thẳng trực tiếp lên ảnh (không tách rời được text
-   * khỏi ảnh nền) — tái sử dụng asset đã CONFIRMED đúng chủ đề (núi đồi Đà Lạt trong
-   * sương) rồi hiển thị chữ thật bằng HTML/CSS, nhất quán với cách trang Ưu đãi và
-   * Trải nghiệm đang làm (không bao giờ dùng ảnh chụp màn hình PDF có chữ nhúng sẵn).
-   */
   finalSection: {
     headline: ["TÚI BA GANG", "ĐÀ LẠT"],
     tagline: "Three places. One way of welcoming you.",

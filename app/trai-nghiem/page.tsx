@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Hero } from "@/components/hero/Hero";
 import { VideoButton } from "@/components/hero/VideoButton";
 import { Container } from "@/components/layout/Container";
+import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import { SectionLabel } from "@/components/layout/SectionLabel";
 import { Button } from "@/components/ui/Button";
 import { ExperienceCard } from "@/components/content/ExperienceCard";
@@ -36,10 +37,18 @@ export default function ExperiencesPage() {
       >
         <VideoButton />
       </Hero>
+      <div className="py-4 px-6 md:px-10">
+        <Breadcrumb
+            items={[
+              { label: "Trang chủ", href: "/" },
+              { label: "Trải nghiệm" },
+            ]}
+          />
+      </div>
 
-      <section className="py-20 md:py-28">
+      <section className="pb-20 md:pb-28">
         <Container>
-          <div className="mb-10 flex flex-wrap items-center justify-between gap-4 border-b border-cream-200 pb-6">
+          <div className="mt-6 mb-10 flex flex-wrap items-center justify-between gap-4 border-b border-cream-200 pb-6">
             <p className="section-label">NHỮNG TRẢI NGHIỆM ĐÁNG NHỚ</p>
             <p className="max-w-sm text-sm text-brown-600">
               Những điều làm nên một Đà Lạt rất riêng tại Túi Ba Gang.
@@ -89,20 +98,6 @@ export default function ExperiencesPage() {
         </p>
       </section>
 
-      {/* OUR STAYS — CONFIRMED File B trang 4 (section này thiếu hoàn toàn ở bản cũ) —
-          xem Phase 6.5 mục 10.5. CTA "XEM PHÒNG" → /phong-nghi/:hotel CONFIRMED
-          (docs/page-specifications.md mục 4: "card cơ sở dẫn sang /phong-nghi").
-          Phase 6.6 mục 2.1 (bug fix): bố cục trước đó SAI so với tham chiếu — khối chữ
-          (label/heading/mô tả + chữ ký "Same place...") nằm thành 1 hàng riêng PHÍA
-          TRÊN, rồi 3 ảnh cơ sở xếp thành hàng RIÊNG bên dưới, đồng thời section không có
-          padding-top (`pb-20` không có `pt`) nên phần chữ "OUR STAYS" bị dính sát/đè lên
-          section tối phía trên. Đối chiếu trực tiếp File B trang 4 (khối "OUR STAYS"):
-          khối chữ và 3 ảnh cơ sở nằm CHUNG 1 hàng — chữ là 1 cột bên TRÁI, 3 ảnh xếp bên
-          PHẢI, độ rộng cột chữ xấp xỉ bằng 1 cột ảnh. Đã đổi sang lưới 4 cột đều
-          (`md:grid-cols-4`, 1 cột chữ + 3 cột ảnh, căn giữa theo chiều dọc) và thêm
-          padding-top cho section để tách khỏi section phía trên. Mobile: không đặt
-          `grid-cols` ở base nên tự động xếp dọc từng khối (chữ rồi lần lượt 3 card),
-          không có horizontal overflow. */}
       <section className="pt-16 pb-20 md:pt-20 md:pb-28">
         <Container>
           <div className="grid gap-8 md:grid-cols-4 md:items-center">

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/layout/Container";
 import { Breadcrumb } from "@/components/navigation/Breadcrumb";
+import { ComingSoonScreen } from "@/components/ui/ComingSoonScreen";
 import { RoomGallery } from "@/components/room/RoomGallery";
 import { Button } from "@/components/ui/Button";
 import { getPropertyBySlug } from "@/lib/content/properties";
@@ -39,14 +40,22 @@ export default async function RoomDetailPage({ params }: Props) {
     notFound();
   }
 
+  if (["ember-style", "little-bay"].includes(hotel)) {
+    return (
+      <section className="flex min-h-screen items-center bg-cream-50 pt-32 pb-16 md:pt-40 md:pb-24">
+        <Container className="w-full">
+          <ComingSoonScreen hotel={hotel} />
+        </Container>
+      </section>
+    );
+  }
+
   return (
-    // Trang này KHÔNG có Hero ở đầu nên Header (nay là `fixed`, xem components/layout/Header.tsx
-    // — Phase 6.5 mục 3) sẽ đè lên nội dung nếu không bù khoảng trống bằng đúng chiều cao Header
-    // (h-20/md:h-24) + khoảng cách gốc (py-10/md:py-14).
     <section className="pt-32 pb-10 md:pt-40 md:pb-14">
       <Container>
         <Breadcrumb
           items={[
+            { label: "Trang chủ", href: "/" },
             { label: "Phòng nghỉ", href: "/phong-nghi" },
             { label: property.shortName, href: `/phong-nghi/${property.slug}` },
             { label: room.name },

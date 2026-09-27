@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { Hero } from "@/components/hero/Hero";
 import { Container } from "@/components/layout/Container";
+import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import { OfferListWithFilter } from "@/components/hotel/OfferListWithFilter";
 import { offers } from "@/lib/content/offers";
 
@@ -35,9 +36,20 @@ export default function OffersPage() {
         </div>
       </Hero>
 
-      <section className="py-16 md:py-20">
+      <div className="pt-4 px-6 md:px-10">
+        <Breadcrumb
+            items={[
+              { label: "Trang chủ", href: "/" },
+              { label: "Ưu đãi" },
+            ]}
+          />
+      </div>
+
+      <section className="pb-32">
         <Container>
-          <OfferListWithFilter offers={offers} />
+          <div className="mt-6">
+            <OfferListWithFilter offers={offers} />
+          </div>
         </Container>
       </section>
 

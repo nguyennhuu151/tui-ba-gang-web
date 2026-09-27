@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { Hero } from "@/components/hero/Hero";
 import { Container } from "@/components/layout/Container";
+import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import { SectionLabel } from "@/components/layout/SectionLabel";
 import { PropertyCard } from "@/components/hotel/PropertyCard";
 import { properties } from "@/lib/content/properties";
@@ -54,10 +55,20 @@ export default function AboutPage() {
 
       {/* Our Story — bố cục 3 phần: text | ảnh chính | 2 ảnh nhỏ xếp chồng + caption,
           CONFIRMED File B trang 2 (khác bản cũ chỉ có 1 ảnh placeholder). */}
-      <section className="py-20 md:py-28">
-        <Container className="grid gap-10 md:grid-cols-[1fr_0.9fr_0.55fr] md:items-start">
+      <div className="py-4 px-6 md:px-10">
+        <Breadcrumb
+        items={[
+          { label: "Trang chủ", href: "/" },
+          { label: "Về chúng tôi" },
+        ]}
+      />
+      </div>
+      <section className="pb-20 md:pb-28">
+        <Container className="grid gap-10 md:grid-cols-[1fr_0.9fr_0.55fr] md:items-stretch">
           <div>
-            <SectionLabel>OUR STORY</SectionLabel>
+            <div className="mt-4">
+              <SectionLabel>OUR STORY</SectionLabel>
+            </div>
             <h2 className="mt-4 font-heading text-2xl leading-tight text-ink md:text-3xl">
               <span className="block">Một chiếc túi,</span>
               <span className="block">một hành trình,</span>
@@ -70,7 +81,7 @@ export default function AboutPage() {
             </div>
           </div>
 
-          <div className="relative aspect-[4/7] w-full overflow-hidden rounded-lg">
+          <div className="relative h-full w-full overflow-hidden rounded-lg">
             <Image
               src="/images/about/about-story-main.webp"
               alt="Túi vải Túi Ba Gang và cuốn sổ &quot;The Journey Stays With You&quot;"
@@ -80,7 +91,7 @@ export default function AboutPage() {
             />
           </div>
 
-          <div className="flex flex-col gap-4">
+          <div className="flex h-full flex-col justify-between gap-4">
             <p className="font-heading text-lg italic leading-snug text-ink">
               A small bag for a bigger journey
             </p>
@@ -89,7 +100,6 @@ export default function AboutPage() {
                 src="/images/about/about-story-pine.webp"
                 alt="Lá thông đọng sương ở Đà Lạt"
                 fill
-                sizes="(min-width: 768px) 20vw, 50vw"
                 className="object-cover"
               />
             </div>
@@ -98,7 +108,6 @@ export default function AboutPage() {
                 src="/images/about/about-story-valley.webp"
                 alt="Thung lũng sương mù Đà Lạt nhìn từ xa"
                 fill
-                sizes="(min-width: 768px) 20vw, 50vw"
                 className="object-cover"
               />
             </div>

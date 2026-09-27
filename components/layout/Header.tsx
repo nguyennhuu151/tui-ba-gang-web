@@ -68,17 +68,25 @@ export function Header() {
   const hotelMatch = pathname?.match(/^\/thu-vien\/([^/]+)\/?$/);
   const hotelSlug = hotelMatch?.[1] as PropertySlug | undefined;
 
-  const hasHero = pathname ? HERO_EXACT_PATHS.has(pathname) || HOTEL_HERO_PATTERN.test(pathname) : false;
+  const hasHero = pathname
+    ? HERO_EXACT_PATHS.has(pathname) ||
+      (HOTEL_HERO_PATTERN.test(pathname) &&
+        !/\/(ember-style|little-bay)(\/)?$/.test(pathname))
+    : false;
 
   // Mặc định false = "chưa cuộn qua Hero" — đúng trạng thái thật khi trang vừa tải
   // (người dùng luôn ở đỉnh trang lúc đầu), nên không có nhấp nháy sai màu chữ trước
   // khi JS kịp gắn observer.
   const [scrolledPastHero, setScrolledPastHero] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
-  // Không reset state đồng bộ trong effect (rule react-hooks/set-state-in-effect):
-  // trang không có Hero đã bị loại bởi `hasHero` ở biến `inverse` bên dưới, còn khi
-  // gắn observer mới thì IntersectionObserver luôn gọi callback ngay lần đầu với trạng
-  // thái thật của sentinel, nên giá trị cũ từ route trước tự được ghi đè.
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 0);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [pathname]);
+
   useEffect(() => {
     if (!hasHero) return;
     const sentinel = document.getElementById("hero-sentinel");
@@ -97,13 +105,13 @@ export function Header() {
     return <PropertySubNav activeProperty={hotelSlug} />;
   }
 
-  const inverse = hasHero && !scrolledPastHero;
+  const inverse = !scrolled && hasHero && !scrolledPastHero;
 
   return (
     <header
-      className={`fixed inset-x-0 top-0 z-30 border bg-transparent transition-colors ${
-        inverse ? "border-cream-50/40" : "border-ink/15"
-      }`}
+      className={`fixed inset-x-0 top-0 z-30 border transition-colors ${
+        scrolled ? "bg-cream-50 backdrop-blur" : "bg-transparent"
+      } ${inverse ? "border-cream-50/40" : "border-ink/15"}`}
     >
       <Container className="flex h-20 items-center justify-between md:h-24">
         <Logo inverse={inverse} />
