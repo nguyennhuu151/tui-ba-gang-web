@@ -1,3 +1,7 @@
+"use client";
+
+import { useI18n } from "@/lib/i18n/client";
+
 /**
  * ImagePlaceholder — ô trống dùng để CHỪA SẴN chỗ cho ảnh thật sẽ thêm sau này,
  * khác với ảnh minh hoạ tạm thời (public/images/*.jpg) — ô này cố ý không có ảnh
@@ -5,12 +9,14 @@
  * Khi có ảnh thật: thay bằng <Image> bình thường, xoá component này khỏi chỗ dùng.
  */
 export function ImagePlaceholder({
-  label = "Hình ảnh sẽ được cập nhật",
+  label,
   className = "",
 }: {
   label?: string;
   className?: string;
 }) {
+  const { dict } = useI18n();
+
   return (
     <div
       className={`flex items-center justify-center rounded-lg border-2 border-dashed border-cream-200 bg-cream-100 ${className}`}
@@ -21,7 +27,7 @@ export function ImagePlaceholder({
           <circle cx="10" cy="12" r="2" stroke="currentColor" strokeWidth="1.4" />
           <path d="M3 19l6-6 4 4 5-5 7 7" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
         </svg>
-        <p className="text-xs">{label}</p>
+        <p className="text-xs">{label ?? dict.common.imageComingSoon}</p>
       </div>
     </div>
   );

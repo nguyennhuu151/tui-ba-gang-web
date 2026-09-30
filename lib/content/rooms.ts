@@ -1,4 +1,6 @@
 import type { PropertySlug, RoomType } from "@/lib/types";
+import type { Locale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 
 /**
  * Danh sách hạng phòng theo từng cơ sở.
@@ -33,8 +35,7 @@ function room(
   name: string,
   maxGuests: number,
   sizeSqm: number,
-  description: string,
-): RoomType {
+): Omit<RoomType, "description" | "amenities"> {
   const slug = slugify(name);
   return {
     hotel,
@@ -43,36 +44,54 @@ function room(
     maxGuests,
     sizeSqm,
     priceFrom: null,
-    description,
-    amenities: ["Wifi tốc độ cao", "Điều hoà", "Nước uống miễn phí"],
     images: [`/images/room-${hotel}-${slug}-1.jpg`, `/images/room-${hotel}-${slug}-2.jpg`],
   };
 }
 
-export const rooms: RoomType[] = [
+/**
+ * Tên hạng phòng vốn là tiếng Anh nên dùng chung cho cả 2 locale. Mô tả và tiện nghi theo
+ * ngôn ngữ nằm ở `roomDescriptions["hotel/slug"]` / `roomAmenities` trong lib/i18n/dictionaries.
+ */
+const roomBase = [
   // Central — CONFIRMED theo ảnh mockup (5 hạng phòng)
-  room("central", "Superior Room", 2, 18, "Phòng gọn gàng, ấm cúng, phù hợp cho chuyến đi ngắn ngày."),
-  room("central", "Deluxe Window", 2, 22, "Có cửa sổ lớn đón sáng, không gian thoáng đãng hơn."),
-  room("central", "Deluxe Plus", 2, 28, "Không gian rộng rãi hơn, tiện nghi đầy đủ."),
-  room("central", "Premier Plus", 2, 32, "Hạng phòng cao cấp, view thành phố."),
-  room("central", "Premier Family", 4, 40, "Phù hợp gia đình, không gian rộng nhất tại Central."),
+  room("central", "Superior Room", 2, 18),
+  room("central", "Deluxe Window", 2, 22),
+  room("central", "Deluxe Plus", 2, 28),
+  room("central", "Premier Plus", 2, 32),
+  room("central", "Premier Family", 4, 40),
 
   // Ember Style — CONFIRMED theo ảnh mockup (4 hạng phòng)
-  room("ember-style", "Deluxe Room", 2, 22, "Ấm áp, đúng tinh thần Ember Style."),
-  room("ember-style", "Premier Room", 2, 28, "Không gian tinh tế hơn với góc thư giãn riêng."),
-  room("ember-style", "Family Room", 4, 40, "Phù hợp gia đình hoặc nhóm bạn."),
-  room("ember-style", "Suite Room", 2, 45, "Hạng phòng cao cấp nhất tại Ember Style."),
+  room("ember-style", "Deluxe Room", 2, 22),
+  room("ember-style", "Premier Room", 2, 28),
+  room("ember-style", "Family Room", 4, 40),
+  room("ember-style", "Suite Room", 2, 45),
 
   // Little Bay — CONFIRMED theo ảnh mockup (3 hạng phòng)
-  room("little-bay", "Bay View Room", 2, 28, "Nhìn ra hồ nước, gần gũi thiên nhiên."),
-  room("little-bay", "Lake View Room", 2, 32, "View hồ trọn vẹn, không gian yên tĩnh."),
-  room("little-bay", "Suite Room", 2, 48, "Hạng phòng rộng nhất tại Little Bay."),
+  room("little-bay", "Bay View Room", 2, 28),
+  room("little-bay", "Lake View Room", 2, 32),
+  room("little-bay", "Suite Room", 2, 48),
 ];
 
-export function getRoomsByHotel(hotel: PropertySlug) {
-  return rooms.filter((r) => r.hotel === hotel);
+const cache = new Map<Locale, RoomType[]>();
+
+export function getRooms(locale: Locale): RoomType[] {
+  let list = cache.get(locale);
+  if (!list) {
+    const dict = getDictionary(locale);
+    list = roomBase.map((room) => ({
+      ...room,
+      description: dict.roomDescriptions[`${room.hotel}/${room.slug}`] ?? "",
+      amenities: dict.roomAmenities,
+    }));
+    cache.set(locale, list);
+  }
+  return list;
 }
 
-export function getRoom(hotel: string, slug: string) {
-  return rooms.find((r) => r.hotel === hotel && r.slug === slug);
+export function getRoomsByHotel(hotel: PropertySlug, locale: Locale) {
+  return getRooms(locale).filter((r) => r.hotel === hotel);
+}
+
+export function getRoom(hotel: string, slug: string, locale: Locale) {
+  return getRooms(locale).find((r) => r.hotel === hotel && r.slug === slug);
 }

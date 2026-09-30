@@ -1,5 +1,10 @@
 "use client";
 
+import { useI18n } from "@/lib/i18n/client";
+
+/** Giá trị đại diện cho lựa chọn "Tất cả" — tách khỏi nhãn hiển thị để không phụ thuộc ngôn ngữ. */
+export const ALL_ROOMS = "__all__";
+
 /**
  * RoomFilterChips — chip lọc "Tất cả" + từng hạng phòng, dùng ở `/phong-nghi/:hotel`.
  * ⚠️ Tên hạng phòng hiện là MOCK DATA (xem lib/content/rooms.ts, docs/open-questions.md
@@ -14,10 +19,11 @@ export function RoomFilterChips({
   active: string;
   onChange: (value: string) => void;
 }) {
-  const all = ["Tất cả", ...options];
+  const { dict } = useI18n();
+  const all = [ALL_ROOMS, ...options];
 
   return (
-    <div className="flex flex-wrap gap-2" role="group" aria-label="Lọc theo hạng phòng">
+    <div className="flex flex-wrap gap-2" role="group" aria-label={dict.roomsPage.filterLabel}>
       {all.map((option) => {
         const isActive = option === active;
         return (
@@ -32,7 +38,7 @@ export function RoomFilterChips({
                 : "border-cream-200 text-brown-600 hover:border-brown-600"
             }`}
           >
-            {option}
+            {option === ALL_ROOMS ? dict.roomsPage.all : option}
           </button>
         );
       })}

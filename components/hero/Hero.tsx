@@ -7,6 +7,7 @@ import { Container } from "@/components/layout/Container";
 import { Button } from "@/components/ui/Button";
 import { CornerTagList } from "@/components/ui/CornerTagList";
 import { HeroPropertySelector } from "@/components/hero/HeroPropertySelector";
+import { TextLines } from "@/components/ui/TextLines";
 
 /**
  * Hero — dùng chung cho mọi trang chính (Phase 6 refactor từ bản Phase 5 chỉ dùng
@@ -154,11 +155,7 @@ export function Hero({
             size === "full" ? "text-4xl md:text-6xl" : "text-3xl md:text-5xl"
           }`}
         >
-          {headline.map((line) => (
-            <span key={line} className="block">
-              {line}
-            </span>
-          ))}
+          <TextLines lines={headline} />
         </motion.h1>
 
         {subheadline && subheadline.length > 0 && (
@@ -168,11 +165,7 @@ export function Hero({
             transition={{ duration: 0.7, delay: 0.15 }}
             className="mt-2 max-w-md font-heading text-xl leading-snug text-cream-50/95 md:text-2xl"
           >
-            {subheadline.map((line) => (
-              <span key={line} className="block">
-                {line}
-              </span>
-            ))}
+            <TextLines lines={subheadline} />
           </motion.p>
         )}
 
@@ -184,11 +177,7 @@ export function Hero({
             className="mt-5 max-w-md text-base text-cream-50/85"
           >
             {Array.isArray(description)
-              ? description.map((line) => (
-                  <span key={line} className="block">
-                    {line}
-                  </span>
-                ))
+              ? <TextLines lines={description} />
               : description}
           </motion.p>
         )}

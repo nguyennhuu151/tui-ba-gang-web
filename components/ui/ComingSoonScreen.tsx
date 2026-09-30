@@ -2,26 +2,19 @@ import Image from "next/image";
 import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import { Button } from "@/components/ui/Button";
 import { SectionLabel } from "@/components/layout/SectionLabel";
-import { getPropertyBySlug } from "@/lib/content/properties";
+import type { Property } from "@/lib/types";
+import { getI18n } from "@/lib/i18n/server";
 
-const CONTACT_IMAGES: Record<string, string> = {
-  "ember-style": "/images/contact-ember-style.jpg",
-  "little-bay": "/images/contact-little-bay.jpg",
-  central: "/images/contact-central.jpg",
-};
-
-export function ComingSoonScreen({ hotel }: { hotel: string }) {
-  const property = getPropertyBySlug(hotel);
-  const name = property?.shortName ?? hotel;
-  const fullName = property?.fullName ?? hotel;
-  const image = CONTACT_IMAGES[hotel] ?? CONTACT_IMAGES.central;
+export async function ComingSoonScreen({ property }: { property: Property }) {
+  const { dict } = await getI18n();
+  const { slug, shortName: name, fullName, contactImage: image } = property;
 
   return (
     <>
       <Breadcrumb
           items={[
-            { label: "Trang chủ", href: "/" },
-            { label: name, href: `/thu-vien/${hotel}` },
+            { label: dict.common.home, href: "/" },
+            { label: name, href: `/thu-vien/${slug}` },
             { label: "Comming Soon" },
           ]}
         />
@@ -35,15 +28,18 @@ export function ComingSoonScreen({ hotel }: { hotel: string }) {
           </div>
 
           <h1 className="mt-4 font-heading text-3xl leading-tight text-ink md:text-5xl">
-            <span className="block">Một góc Đà Lạt khác,</span>
-            <span className="block">đang được chăm chút</span>
-            <span className="block italic text-brown-700">từng chi tiết.</span>
+            {dict.comingSoon.heading.map((line, index) => (
+              <span key={line} className={index === 2 ? "block italic text-brown-700" : "block"}>
+                {line}
+              </span>
+            ))}
           </h1>
 
           <p className="mt-6 max-w-md text-sm leading-relaxed text-brown-600 md:text-base">
-            <strong className="text-ink">{fullName}</strong> dự kiến mở cửa quý IV năm 2026.
-            Hãy theo dõi <strong>Túi Ba Gang</strong> để cập nhật những tin tức đầu tiên về không
-            gian mới, các chương trình ưu đãi đặc biệt và cơ hội trải nghiệm đầu tay.
+            <strong className="text-ink">{fullName}</strong>{" "}
+            {dict.comingSoon.openingBefore}{" "}
+            <strong>Túi Ba Gang</strong>{" "}
+            {dict.comingSoon.openingAfter}
           </p>
 
           <p className="mt-6 font-heading text-lg italic leading-snug text-ink">
@@ -54,10 +50,10 @@ export function ComingSoonScreen({ hotel }: { hotel: string }) {
 
           <div className="mt-8 flex flex-wrap gap-4">
             <Button href="/" variant="primary" withArrow>
-              QUAY VỀ TRANG CHỦ
+              {dict.comingSoon.backToHome}
             </Button>
             <Button href="/thu-vien/central" variant="outline" withArrow>
-              XEM NGAY CƠ SỞ CENTRAL
+              {dict.comingSoon.visitCentral}
             </Button>
           </div>
         </div>
@@ -65,7 +61,7 @@ export function ComingSoonScreen({ hotel }: { hotel: string }) {
         <div className="relative aspect-[4/5] w-full overflow-hidden rounded-lg shadow-xl md:aspect-[3/4]">
           <Image
             src={image}
-            alt={`${fullName} — sẵn sàng chào đón quý IV 2026`}
+            alt={dict.comingSoon.imageAlt(fullName)}
             fill
             sizes="(min-width: 768px) 45vw, 100vw"
             className="object-cover"

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { LocaleLink } from "@/components/navigation/LocaleLink";
 import type { ReactNode, JSX } from "react";
 
 /**
@@ -119,10 +119,10 @@ export function Button(props: ButtonProps): JSX.Element {
 
   if (props.href) {
     return (
-      <Link href={props.href} onClick={props.onClick} className={classes}>
+      <LocaleLink href={props.href} onClick={props.onClick} className={classes}>
         {children}
         {withArrow && <ArrowIcon />}
-      </Link>
+      </LocaleLink>
     );
   }
 

@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { LocaleLink } from "@/components/navigation/LocaleLink";
+import { usePathnameWithoutLocale } from "@/lib/i18n/client";
 
 /**
  * TabFilter — tab có gạch chân khi active, dùng lại cho 2 nơi (theo đúng
@@ -28,7 +28,7 @@ export function TabFilter({
   onSelect?: (key: string) => void;
   className?: string;
 }) {
-  const pathname = usePathname();
+  const pathname = usePathnameWithoutLocale();
 
   return (
     <div className={`flex flex-wrap items-center gap-6 ${className}`} role="tablist">
@@ -42,9 +42,9 @@ export function TabFilter({
 
         if (item.href) {
           return (
-            <Link key={item.key} href={item.href} role="tab" aria-selected={isActive} className={classes}>
+            <LocaleLink key={item.key} href={item.href} role="tab" aria-selected={isActive} className={classes}>
               {item.label}
-            </Link>
+            </LocaleLink>
           );
         }
 

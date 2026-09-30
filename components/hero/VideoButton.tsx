@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useI18n } from "@/lib/i18n/client";
 
 /**
  * VideoButton — nút tròn "▶ Xem video" + caption phụ, dùng ở trang Trải nghiệm.
@@ -12,13 +13,15 @@ import { useState } from "react";
  * đã hoàn chỉnh).
  */
 export function VideoButton({
-  label = "Xem video",
-  caption = "Một ngày ở Túi Ba Gang",
+  label,
+  caption,
 }: {
   label?: string;
   caption?: string;
 }) {
   const [notice, setNotice] = useState(false);
+  const { dict } = useI18n();
+  const videoTitle = dict.experiencesPage.video.title;
 
   return (
     <div className="flex flex-col items-start gap-2">
@@ -33,14 +36,13 @@ export function VideoButton({
           </svg>
         </span>
         <span className="text-left">
-          <span className="block text-sm uppercase tracking-label">{label}</span>
-          <span className="block text-xs text-cream-50/75">{caption}</span>
+          <span className="block text-sm uppercase tracking-label">{label ?? dict.experiencesPage.video.label}</span>
+          <span className="block text-xs text-cream-50/75">{caption ?? videoTitle}</span>
         </span>
       </button>
       {notice && (
         <p role="status" className="max-w-xs text-xs text-cream-50/80">
-          Video &ldquo;Một ngày ở Túi Ba Gang&rdquo; chưa có sẵn — sẽ được cập nhật sau khi có file
-          chính thức.
+          {dict.experiencesPage.video.unavailable(videoTitle)}
         </p>
       )}
     </div>

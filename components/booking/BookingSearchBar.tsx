@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, type FormEvent, type ReactNode } from "react";
-import { properties } from "@/lib/content/properties";
+import { getProperties } from "@/lib/content/properties";
+import { useI18n } from "@/lib/i18n/client";
+import type { AvailabilitySearch } from "@/lib/booking/availability";
 import { GuestCountSelector, type GuestCount } from "@/components/booking/GuestCountSelector";
 import { Button } from "@/components/ui/Button";
 
@@ -14,12 +16,8 @@ import { Button } from "@/components/ui/Button";
  * - Khi bấm "Tìm phòng", hiện thông báo rõ đây là bản mô phỏng, chưa nối dữ liệu thật —
  *   xem docs/api-integration-design.md mục 2.4 (PMS Adapter) cho hướng tích hợp thật ở phase sau.
  */
-export interface BookingSearchValue {
-  location: string;
-  checkIn: string;
-  checkOut: string;
-  guests: GuestCount;
-}
+/** Cùng kiểu với đầu vào của `searchAvailability` (lib/booking/availability.ts). */
+export type BookingSearchValue = AvailabilitySearch;
 
 export function BookingSearchBar({
   initialLocation = "all",
@@ -29,6 +27,7 @@ export function BookingSearchBar({
   /** Dùng ở `/dat-phong` để hiện khu vực kết quả — xem components/booking/RoomAvailabilityList.tsx */
   onSearch?: (value: BookingSearchValue) => void;
 }) {
+  const { locale, dict } = useI18n();
   const [location, setLocation] = useState(initialLocation);
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
@@ -39,7 +38,7 @@ export function BookingSearchBar({
     event.preventDefault();
     // MOCK: chưa tích hợp ezCloud thật (xem docs/api-integration-design.md).
     setNotice(
-      "Đây là bản mô phỏng giao diện tìm phòng. Tính năng kiểm tra phòng trống thật sẽ được tích hợp với ezCloud ở phase sau.",
+      dict.bookingPage.search.mockNotice,
     );
     onSearch?.({ location, checkIn, checkOut, guests });
   };
@@ -51,14 +50,14 @@ export function BookingSearchBar({
           onSubmit={handleSubmit}
           className="flex flex-col gap-4 md:flex-row md:items-center md:gap-6"
         >
-          <Field label="Địa điểm">
+          <Field label={dict.bookingPage.search.location}>
             <select
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               className="w-full bg-transparent text-sm text-ink outline-none"
             >
-              <option value="all">Tất cả khách sạn</option>
-              {properties.map((p) => (
+              <option value="all">{dict.bookingPage.search.allHotels}</option>
+              {getProperties(locale).map((p) => (
                 <option key={p.slug} value={p.slug}>
                   {p.fullName}
                 </option>
@@ -68,7 +67,7 @@ export function BookingSearchBar({
 
           <Divider />
 
-          <Field label="Nhận phòng">
+          <Field label={dict.bookingPage.search.checkIn}>
             <input
               type="date"
               value={checkIn}
@@ -79,7 +78,7 @@ export function BookingSearchBar({
 
           <Divider />
 
-          <Field label="Trả phòng">
+          <Field label={dict.bookingPage.search.checkOut}>
             <input
               type="date"
               value={checkOut}
@@ -90,12 +89,12 @@ export function BookingSearchBar({
 
           <Divider />
 
-          <Field label="Số khách">
+          <Field label={dict.bookingPage.search.guests}>
             <GuestCountSelector value={guests} onChange={setGuests} />
           </Field>
 
           <Button type="submit" withArrow className="w-full justify-center md:w-auto">
-            TÌM PHÒNG
+            {dict.bookingPage.search.submit}
           </Button>
         </form>
 

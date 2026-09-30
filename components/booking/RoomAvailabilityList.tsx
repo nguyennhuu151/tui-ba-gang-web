@@ -4,6 +4,7 @@ import { Spinner } from "@/components/ui/Spinner";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { RoomCard } from "@/components/room/RoomCard";
 import type { RoomType } from "@/lib/types";
+import { useI18n } from "@/lib/i18n/client";
 
 /**
  * RoomAvailabilityList — danh sách phòng trống sau khi tìm kiếm ở `/dat-phong`.
@@ -22,34 +23,35 @@ export function RoomAvailabilityList({
   status: AvailabilityStatus;
   results: RoomType[];
 }) {
+  const { dict } = useI18n();
+
   if (status === "idle") {
     return null;
   }
 
   if (status === "loading") {
-    return <Spinner label="Đang kiểm tra phòng trống..." />;
+    return <Spinner label={dict.bookingPage.results.checking} />;
   }
 
   if (status === "empty" || results.length === 0) {
     return (
       <EmptyState
-        title="Không tìm thấy phòng trống phù hợp"
-        description="Vui lòng thử lại với ngày khác hoặc chọn cơ sở khác."
+        title={dict.bookingPage.results.emptyTitle}
+        description={dict.bookingPage.results.emptyDescription}
       />
     );
   }
 
   return (
     <div>
-      <p className="section-label mb-6">KẾT QUẢ TÌM KIẾM (MOCK)</p>
+      <p className="section-label mb-6">{dict.bookingPage.results.label}</p>
       <div className="grid gap-8 md:grid-cols-3">
         {results.map((room) => (
           <RoomCard key={`${room.hotel}-${room.slug}`} room={room} />
         ))}
       </div>
       <p className="mt-6 text-xs text-brown-600">
-        [CHƯA XÁC NHẬN API] Kết quả thật (giá, tình trạng phòng) sẽ lấy từ ezCloud khi tích hợp —
-        xem docs/api-integration-design.md.
+        {dict.bookingPage.results.apiNote}
       </p>
     </div>
   );

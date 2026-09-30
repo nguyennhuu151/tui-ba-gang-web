@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useI18n } from "@/lib/i18n/client";
 
 export interface GuestCount {
   adults: number;
@@ -19,6 +20,9 @@ export function GuestCountSelector({
   onChange: (value: GuestCount) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const { dict } = useI18n();
+  const adultsLabel = dict.bookingPage.guests.adults;
+  const childrenLabel = dict.bookingPage.guests.children;
 
   const update = (key: keyof GuestCount, delta: number) => {
     const next = Math.max(key === "adults" ? 1 : 0, value[key] + delta);
@@ -36,14 +40,14 @@ export function GuestCountSelector({
       >
         <GuestIcon />
         <span>
-          {value.adults} Người lớn, {value.children} Trẻ em
+          {dict.bookingPage.guests.summary(value.adults, value.children)}
         </span>
       </button>
 
       {open && (
         <div className="absolute left-0 top-full z-20 mt-2 w-64 rounded-md border border-cream-200 bg-cream-50 p-4 shadow-lg">
-          <GuestRow label="Người lớn" count={value.adults} onDecrease={() => update("adults", -1)} onIncrease={() => update("adults", 1)} />
-          <GuestRow label="Trẻ em" count={value.children} onDecrease={() => update("children", -1)} onIncrease={() => update("children", 1)} />
+          <GuestRow label={adultsLabel} count={value.adults} onDecrease={() => update("adults", -1)} onIncrease={() => update("adults", 1)} />
+          <GuestRow label={childrenLabel} count={value.children} onDecrease={() => update("children", -1)} onIncrease={() => update("children", 1)} />
         </div>
       )}
     </div>
@@ -61,6 +65,8 @@ function GuestRow({
   onDecrease: () => void;
   onIncrease: () => void;
 }) {
+  const { dict } = useI18n();
+
   return (
     <div className="flex items-center justify-between py-1.5">
       <span className="text-sm text-ink">{label}</span>
@@ -68,7 +74,7 @@ function GuestRow({
         <button
           type="button"
           onClick={onDecrease}
-          aria-label={`Giảm ${label}`}
+          aria-label={dict.bookingPage.guests.decrease(label)}
           className="flex h-7 w-7 items-center justify-center rounded-full border border-brown-600 text-brown-800"
         >
           −
@@ -77,7 +83,7 @@ function GuestRow({
         <button
           type="button"
           onClick={onIncrease}
-          aria-label={`Tăng ${label}`}
+          aria-label={dict.bookingPage.guests.increase(label)}
           className="flex h-7 w-7 items-center justify-center rounded-full border border-brown-600 text-brown-800"
         >
           +

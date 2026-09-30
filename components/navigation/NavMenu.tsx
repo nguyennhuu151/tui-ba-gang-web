@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { LocaleLink } from "@/components/navigation/LocaleLink";
 import { mainNavItems } from "@/lib/content/navigation";
+import { useI18n, usePathnameWithoutLocale } from "@/lib/i18n/client";
 
 /**
  * NavMenu — menu chính 6 mục, có gạch chân khi active.
@@ -12,14 +12,15 @@ import { mainNavItems } from "@/lib/content/navigation";
  * màu tối mặc định — xem Header.tsx (Phase 6.5 mục 3).
  */
 export function NavMenu({ inverse = false }: { inverse?: boolean }) {
-  const pathname = usePathname();
+  const pathname = usePathnameWithoutLocale();
+  const { dict } = useI18n();
 
   return (
-    <nav aria-label="Menu chính" className="hidden items-center gap-8 lg:flex">
+    <nav aria-label={dict.nav.mainMenu} className="hidden items-center gap-8 lg:flex">
       {mainNavItems.map((item) => {
         const isActive = pathname === item.href;
         return (
-          <Link
+          <LocaleLink
             key={item.href}
             href={item.href}
             className={`text-sm transition-colors ${
@@ -32,8 +33,8 @@ export function NavMenu({ inverse = false }: { inverse?: boolean }) {
                 : ""
             }`}
           >
-            {item.label}
-          </Link>
+            {dict.nav[item.key]}
+          </LocaleLink>
         );
       })}
     </nav>

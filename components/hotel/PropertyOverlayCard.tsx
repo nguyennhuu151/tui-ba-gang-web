@@ -5,12 +5,13 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { CornerTagList } from "@/components/ui/CornerTagList";
 import type { Property } from "@/lib/types";
+import { useI18n } from "@/lib/i18n/client";
 
 export function PropertyOverlayCard({
   property,
   index = 0,
   ctaHref,
-  ctaLabel = "XEM PHÒNG",
+  ctaLabel,
   showNumber = false,
   description,
   tags,
@@ -23,6 +24,8 @@ export function PropertyOverlayCard({
   description?: string;
   tags?: string[];
 }) {
+  const { dict } = useI18n();
+
   return (
     <motion.article
       initial={{ opacity: 0, y: 16 }}
@@ -57,7 +60,7 @@ export function PropertyOverlayCard({
 
       <div className="absolute left-5 right-5 bottom-5 flex w-[calc(100%-2.5rem)] items-end justify-between gap-4 md:left-6 md:right-6 md:bottom-6 md:w-[calc(100%-3rem)]">
         <Button href={ctaHref ?? `/thu-vien/${property.slug}`} variant="outline" inverse size="sm">
-          {ctaLabel}
+          {ctaLabel ?? dict.common.viewRooms}
         </Button>
         {tags && tags.length > 0 && (
           <ul className="flex max-w-[45%] flex-col gap-[2px]">

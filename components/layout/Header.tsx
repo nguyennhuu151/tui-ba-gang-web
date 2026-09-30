@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
 import { Logo } from "@/components/layout/Logo";
 import { NavMenu } from "@/components/navigation/NavMenu";
 import { MobileMenu } from "@/components/navigation/MobileMenu";
@@ -10,9 +9,8 @@ import { Container } from "@/components/layout/Container";
 import { Button } from "@/components/ui/Button";
 import { PropertySubNav } from "@/components/layout/PropertySubNav";
 import { bookingHref } from "@/lib/content/navigation";
-import type { PropertySlug } from "@/lib/types";
-
-const PROPERTY_SLUGS: PropertySlug[] = ["central", "ember-style", "little-bay"];
+import { getPropertyBySlug } from "@/lib/content/properties";
+import { useI18n, usePathnameWithoutLocale } from "@/lib/i18n/client";
 
 // Các route có ảnh Hero ngay đầu trang (xem `components/hero/Hero.tsx`) — Header cần
 // chữ SÁNG (inverse) để đọc được trên ảnh. Xác định bằng cách rà tất cả nơi import
@@ -20,9 +18,10 @@ const PROPERTY_SLUGS: PropertySlug[] = ["central", "ember-style", "little-bay"];
 // riêng, không qua nhánh này) — không suy đoán, dựa trực tiếp trên component thật
 // đang được dùng ở từng trang.
 const HERO_EXACT_PATHS = new Set(["/", "/ve-chung-toi", "/trai-nghiem", "/uu-dai", "/dat-phong"]);
-// `/phong-nghi/:hotel` có Hero, nhưng `/phong-nghi/:hotel/:room` (trang chi tiết
-// phòng) thì KHÔNG — phải phân biệt bằng regex, không thể gộp vào set ở trên.
-const HOTEL_HERO_PATTERN = /^\/phong-nghi\/[^/]+\/?$/;
+// `/phong-nghi/:hotel` có Hero (trừ cơ sở "coming-soon" — hiện ComingSoonScreen), nhưng
+// `/phong-nghi/:hotel/:room` (trang chi tiết phòng) thì KHÔNG.
+const HOTEL_ROOMS_PATTERN = /^\/phong-nghi\/([^/]+)\/?$/;
+const HOTEL_LIBRARY_PATTERN = /^\/thu-vien\/([^/]+)\/?$/;
 
 /**
  * Header — dùng chung cho mọi trang, NGOẠI TRỪ `/thu-vien/:hotel` (mỗi trang cơ sở
@@ -64,15 +63,13 @@ const HOTEL_HERO_PATTERN = /^\/phong-nghi\/[^/]+\/?$/;
  *   theo dõi scroll vì không có ảnh nào để cuộn qua).
  */
 export function Header() {
-  const pathname = usePathname();
-  const hotelMatch = pathname?.match(/^\/thu-vien\/([^/]+)\/?$/);
-  const hotelSlug = hotelMatch?.[1] as PropertySlug | undefined;
+  // Bỏ tiền tố /vi, /en để so khớp với các đường dẫn bên dưới.
+  const pathname = usePathnameWithoutLocale();
+  const { locale, dict } = useI18n();
+  const libraryProperty = getPropertyBySlug(pathname.match(HOTEL_LIBRARY_PATTERN)?.[1] ?? "", locale);
+  const roomsProperty = getPropertyBySlug(pathname.match(HOTEL_ROOMS_PATTERN)?.[1] ?? "", locale);
 
-  const hasHero = pathname
-    ? HERO_EXACT_PATHS.has(pathname) ||
-      (HOTEL_HERO_PATTERN.test(pathname) &&
-        !/\/(ember-style|little-bay)(\/)?$/.test(pathname))
-    : false;
+  const hasHero = HERO_EXACT_PATHS.has(pathname) || roomsProperty?.status === "open";
 
   // Mặc định false = "chưa cuộn qua Hero" — đúng trạng thái thật khi trang vừa tải
   // (người dùng luôn ở đỉnh trang lúc đầu), nên không có nhấp nháy sai màu chữ trước
@@ -101,8 +98,8 @@ export function Header() {
     return () => observer.disconnect();
   }, [hasHero, pathname]);
 
-  if (hotelSlug && PROPERTY_SLUGS.includes(hotelSlug)) {
-    return <PropertySubNav activeProperty={hotelSlug} />;
+  if (libraryProperty) {
+    return <PropertySubNav activeProperty={libraryProperty.slug} />;
   }
 
   const inverse = !scrolled && hasHero && !scrolledPastHero;
@@ -118,7 +115,7 @@ export function Header() {
         <NavMenu inverse={inverse} />
         <div className="flex items-center gap-5">
           <Button href={bookingHref} className="hidden sm:inline-flex" withArrow>
-            ĐẶT PHÒNG
+            {dict.common.bookNow}
           </Button>
           <div className="hidden lg:block">
             <LanguageSwitcher inverse={inverse} />

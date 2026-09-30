@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { useI18n } from "@/lib/i18n/client";
 
 /**
  * RoomGallery — gallery ảnh 1 phòng, dùng ở `/phong-nghi/:hotel/:roomSlug`.
@@ -9,6 +10,7 @@ import Image from "next/image";
  */
 export function RoomGallery({ images, alt }: { images: string[]; alt: string }) {
   const [active, setActive] = useState(0);
+  const { dict } = useI18n();
 
   return (
     <div>
@@ -22,7 +24,7 @@ export function RoomGallery({ images, alt }: { images: string[]; alt: string }) 
               key={src}
               type="button"
               onClick={() => setActive(index)}
-              aria-label={`Xem ảnh ${index + 1}`}
+              aria-label={dict.roomsPage.viewPhoto(index + 1)}
               aria-current={index === active}
               className={`relative h-16 w-24 shrink-0 overflow-hidden rounded-md ring-2 transition-colors ${
                 index === active ? "ring-brown-800" : "ring-transparent"

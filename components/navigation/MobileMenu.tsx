@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { LocaleLink } from "@/components/navigation/LocaleLink";
 import { mainNavItems, bookingHref } from "@/lib/content/navigation";
 import { Button } from "@/components/ui/Button";
+import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+import { useI18n } from "@/lib/i18n/client";
 
 /**
  * MobileMenu — menu dạng hamburger/drawer cho màn hình < lg.
@@ -15,12 +17,13 @@ import { Button } from "@/components/ui/Button";
  */
 export function MobileMenu({ inverse = false }: { inverse?: boolean }) {
   const [open, setOpen] = useState(false);
+  const { dict } = useI18n();
 
   return (
     <div className="lg:hidden">
       <button
         type="button"
-        aria-label={open ? "Đóng menu" : "Mở menu"}
+        aria-label={open ? dict.nav.closeMenu : dict.nav.openMenu}
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
         className={`flex h-9 w-9 items-center justify-center ${
@@ -40,22 +43,27 @@ export function MobileMenu({ inverse = false }: { inverse?: boolean }) {
 
       {open && (
         <div className="fixed inset-x-0 top-[80px] z-40 border-t border-cream-200 bg-cream-50 px-6 py-6 shadow-lg">
-          <nav aria-label="Menu chính (mobile)" className="flex flex-col gap-5">
+          <nav aria-label={dict.nav.mainMenuMobile} className="flex flex-col gap-5">
             {mainNavItems.map((item) => (
-              <Link
+              <LocaleLink
                 key={item.href}
                 href={item.href}
                 onClick={() => setOpen(false)}
                 className="font-heading text-lg text-ink"
               >
-                {item.label}
-              </Link>
+                {dict.nav[item.key]}
+              </LocaleLink>
             ))}
           </nav>
           <div className="mt-6">
             <Button href={bookingHref} onClick={() => setOpen(false)} className="w-full justify-center">
-              ĐẶT PHÒNG
+              {dict.common.bookNow}
             </Button>
+          </div>
+          {/* Trước đây LanguageSwitcher chỉ hiện từ màn hình `lg` (desktop) — thêm vào menu
+              mobile để khách dùng điện thoại cũng đổi được ngôn ngữ. */}
+          <div className="mt-6 border-t border-cream-200 pt-4">
+            <LanguageSwitcher variant="inline" />
           </div>
         </div>
       )}

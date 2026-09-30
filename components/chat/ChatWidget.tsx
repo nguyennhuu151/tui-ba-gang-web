@@ -2,7 +2,8 @@
 
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
-import { resetSession, streamChat } from "@/lib/chat";
+import { ChatHttpError, resetSession, streamChat } from "@/lib/chat";
+import { useI18n } from "@/lib/i18n/client";
 
 /**
  * ChatWidget — nút mở chat + khung chat với trợ lý ảo (backend: chatbot/backend).
@@ -17,23 +18,11 @@ type Message = { id: string; role: "user" | "assistant"; text: string; error?: b
 const SESSION_KEY = "tbg_chat_session";
 const MESSAGES_KEY = "tbg_chat_messages";
 
-const TOOL_LABELS: Record<string, string> = {
-  list_room_types: "Đang xem danh sách phòng…",
-  check_availability: "Đang kiểm tra phòng trống…",
-};
 
-const SUGGESTIONS = [
-  "Khách sạn có những loại phòng nào?",
-  "Cuối tuần này còn phòng cho 2 người không?",
-  "Giờ nhận và trả phòng là mấy giờ?",
-  "Chính sách huỷ phòng thế nào?",
-];
 
-const WELCOME: Message = {
-  id: "welcome",
-  role: "assistant",
-  text: "Xin chào! Mình là trợ lý ảo của **Túi Ba Gang**. Mình có thể giúp bạn tra cứu phòng, giá và chính sách lưu trú.",
-};
+// Lời chào lưu vào localStorage chỉ với id, nội dung render theo ngôn ngữ đang xem —
+// đổi VI/EN thì lời chào đổi theo, không bị kẹt ở ngôn ngữ lúc mở chat lần đầu.
+const WELCOME: Message = { id: "welcome", role: "assistant", text: "" };
 
 function uid() {
   return Math.random().toString(36).slice(2);
@@ -79,6 +68,7 @@ function CloseIcon({ size = 18 }: { size?: number }) {
 }
 
 export function ChatWidget() {
+  const { dict } = useI18n();
   const [open, setOpen] = useState(false);
   // Panel chỉ render khi mở (luôn đóng lúc SSR) nên đọc localStorage ngay khi khởi tạo
   // không gây lệch hydration.
@@ -116,7 +106,7 @@ export function ChatWidget() {
     setMessages((m) => [...m, { id: uid(), role: "user", text }, { id: botId, role: "assistant", text: "" }]);
     setInput("");
     setBusy(true);
-    setStatus("Đang soạn trả lời…");
+    setStatus(dict.chat.status.writing);
 
     const patchBot = (fn: (msg: Message) => Message) =>
       setMessages((m) => m.map((msg) => (msg.id === botId ? fn(msg) : msg)));
@@ -138,7 +128,7 @@ export function ChatWidget() {
               patchBot((msg) => ({ ...msg, text: msg.text + e.text }));
               break;
             case "tool":
-              setStatus(TOOL_LABELS[e.name] ?? "Đang tra cứu…");
+              setStatus(dict.chat.status.tools[e.name] ?? dict.chat.status.lookingUp);
               break;
             case "error":
               patchBot((msg) => ({ ...msg, text: msg.text ? `${msg.text}\n\n${e.message}` : e.message, error: true }));
@@ -151,10 +141,12 @@ export function ChatWidget() {
       if (!controller.signal.aborted) {
         const message =
           err instanceof TypeError
-            ? "Không kết nối được trợ lý ảo. Vui lòng thử lại sau hoặc liên hệ hotline/Zalo."
-            : err instanceof Error
-              ? err.message
-              : "Không kết nối được máy chủ.";
+            ? dict.chat.errors.unreachable
+            : err instanceof ChatHttpError
+              ? err.message || dict.chat.errors.server(err.status)
+              : err instanceof Error
+                ? err.message
+                : dict.chat.errors.connection;
         patchBot((msg) => ({ ...msg, text: message, error: true }));
       }
     } finally {
@@ -175,6 +167,8 @@ export function ChatWidget() {
     setMessages([WELCOME]);
   }
 
+  const displayMessages = messages.map((m) => (m.id === WELCOME.id ? { ...m, text: dict.chat.welcome } : m));
+
   function onSubmit(e: FormEvent) {
     e.preventDefault();
     send(input);
@@ -192,20 +186,20 @@ export function ChatWidget() {
       {open && (
         <section
           id="tbg-chat-panel"
-          aria-label="Chat với trợ lý Túi Ba Gang"
+          aria-label={dict.chat.panelLabel}
           className="fixed inset-x-0 bottom-0 z-50 flex h-[85dvh] flex-col overflow-hidden rounded-t-2xl bg-cream-50 text-ink shadow-2xl md:inset-x-auto md:bottom-6 md:right-24 md:h-[min(600px,calc(100dvh-7rem))] md:w-[380px] md:rounded-2xl"
         >
           <header className="flex items-center justify-between bg-brown-800 px-5 py-4 text-cream-50">
             <div>
-              <p className="font-heading text-lg leading-tight">Trợ lý Túi Ba Gang</p>
-              <p className="text-xs text-cream-50/70">Thường trả lời trong vài giây</p>
+              <p className="font-heading text-lg leading-tight">{dict.chat.title}</p>
+              <p className="text-xs text-cream-50/70">{dict.chat.subtitle}</p>
             </div>
             <div className="flex items-center gap-1">
               <button
                 type="button"
                 onClick={newConversation}
-                title="Cuộc trò chuyện mới"
-                aria-label="Cuộc trò chuyện mới"
+                title={dict.chat.newConversation}
+                aria-label={dict.chat.newConversation}
                 className="flex h-9 w-9 items-center justify-center rounded-full text-cream-50/80 transition-colors hover:bg-cream-50/10 hover:text-cream-50"
               >
                 <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -221,8 +215,8 @@ export function ChatWidget() {
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                title="Đóng"
-                aria-label="Đóng chat"
+                title={dict.chat.closeShort}
+                aria-label={dict.chat.close}
                 className="flex h-9 w-9 items-center justify-center rounded-full text-cream-50/80 transition-colors hover:bg-cream-50/10 hover:text-cream-50"
               >
                 <CloseIcon />
@@ -231,7 +225,7 @@ export function ChatWidget() {
           </header>
 
           <div ref={listRef} className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 py-5" aria-live="polite">
-            {messages.map((m) =>
+            {displayMessages.map((m) =>
               m.role === "assistant" && !m.text ? null : (
                 <div
                   key={m.id}
@@ -277,7 +271,7 @@ export function ChatWidget() {
 
             {messages.length === 1 && !busy && (
               <div className="mt-1 flex flex-wrap gap-2">
-                {SUGGESTIONS.map((s) => (
+                {dict.chat.suggestions.map((s) => (
                   <button
                     key={s}
                     type="button"
@@ -297,10 +291,10 @@ export function ChatWidget() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={onKeyDown}
-              placeholder="Nhập câu hỏi của bạn…"
+              placeholder={dict.chat.placeholder}
               rows={1}
               maxLength={2000}
-              aria-label="Tin nhắn"
+              aria-label={dict.chat.messageLabel}
               className="max-h-32 flex-1 resize-none rounded-xl border border-cream-200 bg-white px-3 py-2.5 text-sm text-ink placeholder:text-brown-600/60 focus:border-brown-600 focus:outline-none"
             />
             <button
@@ -308,7 +302,7 @@ export function ChatWidget() {
               disabled={busy || !input.trim()}
               className="rounded-xl bg-brown-800 px-4 py-2.5 text-sm font-medium text-cream-50 transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
             >
-              Gửi
+              {dict.chat.send}
             </button>
           </form>
         </section>
@@ -317,7 +311,7 @@ export function ChatWidget() {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        aria-label={open ? "Đóng chat" : "Chat với trợ lý ảo"}
+        aria-label={open ? dict.chat.close : dict.chat.open}
         aria-expanded={open}
         aria-controls="tbg-chat-panel"
         className="flex h-12 w-12 items-center justify-center rounded-full bg-cream-50 text-brown-800 shadow-lg ring-1 ring-brown-800/15 transition-transform hover:scale-105"

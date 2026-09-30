@@ -1,4 +1,7 @@
 import type { Property } from "@/lib/types";
+import type { Locale } from "@/lib/i18n/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { mergeText, type DeepPartial } from "@/lib/content/merge-text";
 
 /**
  * Dữ liệu 3 cơ sở — Phase 6.5 (mục 13-15) đã thay toàn bộ phần `story`, `amenities`,
@@ -18,57 +21,43 @@ import type { Property } from "@/lib/types";
  * Phase 6.8: `story.image` (string đơn) đổi thành `story.images` (mảng) để hỗ trợ
  * layout 1 ảnh ngang (Central) hoặc collage 3 ảnh (Ember Style) — xem mục 5.2/6.2
  * trong report Phase 6.8.
+ *
+ * i18n: file này chỉ giữ phần KHÔNG phụ thuộc ngôn ngữ (ảnh, icon, liên hệ, text tiếng Anh
+ * dùng chung). Text theo ngôn ngữ nằm ở `properties.<slug>` trong
+ * lib/i18n/dictionaries/vi.ts | en.ts và được ghép vào khi gọi `getProperties(locale)`.
+ * Mảng `amenities`/`moodTiles` ghép theo THỨ TỰ phần tử — thêm/bớt phần tử ở đây thì
+ * phải sửa cùng vị trí trong cả 2 file dictionary.
  */
-export const properties: Property[] = [
+const propertyBase: DeepPartial<Property>[] = [
   {
     slug: "central",
     order: "01",
+    status: "open",
+    accent: "brown",
+    contactImage: "/images/contact-central.jpg",
+    heroLocationTag: "TÚI BA GANG",
     fullName: "Túi Ba Gang Central",
     shortName: "Central",
-    tagline: "Sôi động giữa lòng phố",
     taglineEn: "A city stay with a softer rhythm",
-    cardDescription: "Ở giữa Đà Lạt, gần hơn với mọi cuộc hẹn.",
     cardImage: "/images/hotel/exterior/hotel-central-exterior-main.webp",
     heroImage: "/images/thuvien-hero-central.jpg",
     tags: ["CITY", "PEOPLE", "CONNECTIONS"],
-    heroSubheadline: ["Sôi động giữa", "lòng phố."],
     heroDashTag: ["A CITY STAY", "WITH A SOFTER RHYTHM"],
     heroTopRightTag: ["PEOPLE", "PLACES", "MOMENTS", "A SLOWER WAY"],
     story: {
       label: "OUR STORY",
-      heading: ["Một điểm dừng", "đầy cảm hứng."],
-      paragraphs: [
-        "Túi Ba Gang Central là nơi nhịp sống Đà Lạt hiện đại và sự riêng tư gặp nhau. Nằm ngay trung tâm thành phố, khách sạn mang đến một không gian lưu trú thoải mái, tinh tế và thuận tiện — để bạn dễ dàng khám phá những điều thú vị của Đà Lạt, theo cách riêng của mình.",
-      ],
       images: ["/images/story-central.jpg"],
-      ctaLabel: "TÌM HIỂU CÂU CHUYỆN",
     },
     amenities: [
-      {
-        icon: "pin",
-        title: "VỊ TRÍ TRUNG TÂM",
-        description: "Dễ dàng kết nối với những điểm đến và nhịp sống của Đà Lạt.",
-      },
-      {
-        icon: "breakfast",
-        title: "ẨM THỰC TINH TẾ",
-        description: "Những lựa chọn ẩm thực được chăm chút cho từng khoảnh khắc lưu trú.",
-      },
-      {
-        icon: "bed",
-        title: "KHÔNG GIAN LƯU TRÚ TIỆN NGHI",
-        description: "Phòng nghỉ thoải mái, chỉnh chu và phù hợp cho những ngày ở lại Đà Lạt.",
-      },
+      { icon: "pin" },
+      { icon: "breakfast" },
+      { icon: "bed" },
     ],
-    amenitiesSection: {
-      label: "NHỮNG TIỆN NGHI",
-      heading: ["Đủ đầy cho một kỳ nghỉ trọn vẹn."],
-    },
+    amenitiesSection: {},
     roomsSection: {
-      label: "PHÒNG NGHỈ",
       heading: "Cozy Rooms",
       subheading: "Simple, comfortable and inviting.",
-      ctaLabel: "XEM TẤT CẢ PHÒNG",
+      previewImages: ["/images/room-central-deluxe-plus-1.jpg", "/images/room-central-deluxe-plus-2.jpg"],
     },
     dining: {
       label: "GOOD FOOD BRIGHTER DAYS",
@@ -83,15 +72,11 @@ export const properties: Property[] = [
       // "Vấn đề phát hiện" trong claude/phase6.8-report.md, cần ảnh thật thay thế sau.
       secondaryImage: "/images/dining-central-square.jpg",
       secondaryCaption: ["Good Food", "Good Mood"],
-      note: "Đà Lạt, luôn có những điều dịu dàng để ta muốn quay lại.",
-      ctaLabel: "KHÁM PHÁ ẨM THỰC",
     },
     // KHÔNG có banner CTA cuối trang — CONFIRMED File B trang 6 kết thúc ngay sau mục
     // Ẩm thực (xem ghi chú ở lib/types.ts `closingBanner`).
     closingBanner: {
-      tag: ["ĐÀ LẠT", "CENTRAL", "A DEEPER YOU"],
       subtitle: "Same mountains, a gentler you.",
-      ctaLabel: "ĐẶT PHÒNG NGAY",
     },
     contact: {
       hotline: "0263 383 7837",
@@ -101,24 +86,20 @@ export const properties: Property[] = [
   {
     slug: "ember-style",
     order: "02",
+    status: "coming-soon",
+    accent: "ember",
+    contactImage: "/images/contact-ember-style.jpg",
+    heroLocationTag: "TÚI BA GANG",
     fullName: "Túi Ba Gang Ember Style",
     shortName: "Ember Style",
-    tagline: "Ấm áp. Tinh tế. Năng lượng.",
     taglineEn: "A warmer stay, a deeper you",
-    cardDescription: "Ấm áp. Tinh tế. Năng lượng.",
     cardImage: "/images/hotel/exterior/hotel-ember-style-exterior-main.webp",
     heroImage: "/images/thuvien-hero-ember-style.jpg",
-    heroSubheadline: ["Ấm áp.", "Tinh tế.", "Năng lượng."],
     heroDashTag: ["A WARMER STAY", "A DEEPER YOU"],
     heroTopRightTag: ["PEOPLE", "PLACES", "MOMENTS", "A WARMER YOU"],
     tags: ["PEOPLE", "MOMENTS", "A WARMER YOU"],
     story: {
       label: "OUR STORY",
-      heading: ["Ngọn lửa của", "những hành trình đẹp hơn."],
-      paragraphs: [
-        "Túi Ba Gang Ember Style được tạo nên từ cảm hứng về một dải lụa đỏ – mềm mại, ấm áp và đầy sức sống. Hình ảnh dải cầu thang đỏ là biểu tượng cho những hành trình được nâng niu, nơi mỗi bước chân dẫn bạn đến những trải nghiệm tinh tế hơn, sâu sắc hơn.",
-        "Tại Ember Style, chúng tôi mang đến một không gian hiện đại, sang trọng và tràn đầy năng lượng, cùng những dịch vụ và đặc quyền được thiết kế riêng cho những vị khách mong muốn nhiều hơn từ một kỳ nghỉ.",
-      ],
       // Phase 6.8 mục 6.2 (bug fix): CONFIRMED File B trang 7 dùng 3 ảnh dạng collage
       // (1 ảnh lớn cầu thang đỏ + 2 ảnh nhỏ xếp chồng: thiệp "Good Places Brighter
       // People" và ảnh núi đồi sương mù "Same place, a different you") — trước đó chỉ
@@ -129,22 +110,18 @@ export const properties: Property[] = [
     },
     // CONFIRMED nền tối, icon + nhãn ngắn (không có mô tả) — File B trang 7.
     amenities: [
-      { icon: "crown", label: "Đặc quyền lưu trú" },
-      { icon: "breakfast", label: "Ẩm thực tinh tế" },
-      { icon: "lotus", label: "Chăm sóc cá nhân hoá" },
-      { icon: "sparkle", label: "Không gian riêng tư" },
-      { icon: "heart", label: "Trải nghiệm đặc biệt" },
+      { icon: "crown" },
+      { icon: "breakfast" },
+      { icon: "lotus" },
+      { icon: "sparkle" },
+      { icon: "heart" },
     ],
     amenitiesSection: {
       label: "A HIGHER STANDARD",
-      heading: ["Nhiều hơn một kỳ nghỉ."],
       dark: true,
     },
     roomsSection: {
       label: "ROOMS & SUITES",
-      heading: "Không gian của sự tinh tế.",
-      subheading: "Mỗi căn phòng là một khoảng lặng ấm áp, được chăm chút trong từng chi tiết, mang đến sự thoải mái và cảm giác riêng tư sang trọng.",
-      ctaLabel: "XEM TẤT CẢ PHÒNG NGHỈ",
       // Phase 6.8 (phát hiện khi đối chiếu lại File B trang 7 cho mục 6.3): tham chiếu
       // hiển thị 4 phòng preview (Ember Style có đúng 4 hạng phòng trong rooms.ts), không
       // phải 3 như mặc định dùng chung cho Central.
@@ -154,7 +131,6 @@ export const properties: Property[] = [
     // (xem docs/open-questions.md #8), Ember Style chưa có căn cứ để thêm section này.
     closingBanner: {
       tag: ["A WARMER STAY", "A DEEPER YOU"],
-      ctaLabel: "ĐẶT PHÒNG NGAY",
     },
     contact: {
       // Lưu ý: số này trùng với Central trong File B — nghi ngờ lỗi copy-paste,
@@ -167,84 +143,55 @@ export const properties: Property[] = [
   {
     slug: "little-bay",
     order: "03",
+    status: "coming-soon",
+    accent: "littlebay",
+    contactImage: "/images/contact-little-bay.jpg",
+    listingLine: "A little bay by Túi Ba Gang.",
     fullName: "Túi Ba Gang Little Bay",
     shortName: "Little Bay",
     tagline: "A little bay by Túi Ba Gang",
     taglineEn: "Nature · People · A slower way",
-    cardDescription: "Bình yên bên hồ, gần gũi thiên nhiên.",
     cardImage: "/images/hotel/interior/hotel-little-bay-living-pool.webp",
     cardImageFocus: "80% center",
     heroImage: "/images/thuvien-hero-little-bay.jpg",
     heroHeadline: ["A little bay", "by Túi Ba Gang"],
-    heroSubheadline: ["Một vịnh nhỏ ở Đà Lạt", "mang dấu ấn Túi Ba Gang."],
     heroDashTag: ["NATURE · PEOPLE", "A SLOWER WAY"],
-    heroTopRightTag: ["SƯƠNG SỚM", "CÂY XANH", "NHỮNG ĐIỀU", "BÌNH YÊN"],
     tags: ["NATURE", "RELAXATION", "A DIFFERENT YOU"],
     moodTiles: [
       {
         key: "sunrise",
         label: "SUNRISE BAY",
-        title: "Bình Minh",
-        description: "Khởi đầu ngày mới với năng lượng an lành.",
         image: "/images/story-little-bay.jpg",
       },
       {
         key: "sunset",
         label: "SUNSET BAY",
-        title: "Hoàng Hôn",
-        description: "Lắng đọng cùng những chiều dịu nhẹ.",
         image: "/images/little-bay/mood-sunset-bay.webp",
       },
       {
         key: "midnight",
         label: "MIDNIGHT BAY",
-        title: "Ánh Trăng",
-        description: "Thư thái trong đêm yên bình.",
         image: "/images/little-bay/mood-midnight-bay.webp",
       },
     ],
     amenities: [
-      {
-        icon: "leaf",
-        title: "KHÔNG GIAN BIỆT LẬP",
-        description: "Ba villa riêng giữa thiên nhiên xanh mát.",
-      },
-      {
-        icon: "pine",
-        title: "THIÊN NHIÊN GẦN GŨI",
-        description: "Bao quanh bởi cây xanh, không khí trong lành.",
-      },
-      {
-        icon: "lotus",
-        title: "TRẢI NGHIỆM THƯ THÁI",
-        description: "Không gian lý tưởng để tái tạo năng lượng.",
-      },
-      {
-        icon: "heart",
-        title: "DẤU ẤN TÚI BA GANG",
-        description: "Sự chỉn chu và tinh tế trong từng chi tiết.",
-      },
+      { icon: "leaf" },
+      { icon: "pine" },
+      { icon: "lotus" },
+      { icon: "heart" },
     ],
     // CONFIRMED heading chính LÀ nhãn (không có dòng nhãn nhỏ tách riêng phía trên như
     // Central/Ember Style) — File B trang 8.
-    amenitiesSection: {
-      heading: ["THIÊN NHIÊN,", "RIÊNG TƯ VÀ CHẬM RÃI."],
-    },
+    amenitiesSection: {},
     // KHÔNG có mục preview phòng trên trang này (thay bằng `moreThanStay` — CONFIRMED
     // File B trang 8, không có phòng nào được nêu tên cụ thể ở đây).
     moreThanStay: {
       label: "MORE THAN A STAY",
-      heading: ["Một không gian", "dành cho những ngày sống chậm lại."],
-      paragraph:
-        "Tại Little Bay, mỗi khoảnh khắc đều được thiết kế để bạn kết nối sâu hơn với thiên nhiên, với những người thân yêu và với chính mình.",
-      linkLabel: "TÌM HIỂU THÊM",
       image: "/images/little-bay/more-than-a-stay.webp",
     },
     // Không có mục "Ẩm thực" riêng — tương tự Ember Style, chưa có căn cứ CONFIRMED.
     closingBanner: {
-      tag: ["ĐÀ LẠT", "A LITTLE BAY", "A DEEPER YOU"],
       subtitle: "Same mountains, a gentler you.",
-      ctaLabel: "ĐẶT PHÒNG NGAY",
     },
     contact: {
       // Phase 6.6 (bug fix bổ sung, ngoài danh sách chính nhưng phát hiện khi đối chiếu
@@ -257,6 +204,27 @@ export const properties: Property[] = [
   },
 ];
 
-export function getPropertyBySlug(slug: string) {
-  return properties.find((p) => p.slug === slug);
+const cache = new Map<Locale, Property[]>();
+
+export function getProperties(locale: Locale): Property[] {
+  let list = cache.get(locale);
+  if (!list) {
+    const text = getDictionary(locale).properties;
+    list = propertyBase.map((base) => mergeText<Property>(base, text[base.slug as keyof typeof text]));
+    cache.set(locale, list);
+  }
+  return list;
 }
+
+export function getPropertyBySlug(slug: string, locale: Locale) {
+  return getProperties(locale).find((p) => p.slug === slug);
+}
+
+/**
+ * Liên hệ chung của thương hiệu (nút gọi/Zalo nổi) — dùng hotline CONFIRMED của Central,
+ * xem docs/requirements-analysis.md. Đổi cơ sở đại diện thì đổi slug ở đây.
+ */
+export const brandContact = getPropertyBySlug("central", "vi")!.contact;
+
+/** Slug các cơ sở — không phụ thuộc ngôn ngữ, dùng cho generateStaticParams/sitemap. */
+export const propertySlugs = getProperties("vi").map((p) => p.slug);
