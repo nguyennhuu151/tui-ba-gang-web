@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import type { RoomType } from "@/lib/types";
+import { useI18n } from "@/lib/i18n/client";
 
 /**
  * RoomCard — dùng ở `/phong-nghi/:hotel` (danh sách đầy đủ, `variant="default"`)
@@ -14,6 +17,8 @@ export function RoomCard({
   room: RoomType;
   variant?: "default" | "compact";
 }) {
+  const { dict } = useI18n();
+
   return (
     <article className="flex flex-col overflow-hidden rounded-lg bg-cream-100">
       <div className={`relative w-full ${variant === "compact" ? "aspect-[4/3]" : "aspect-[16/11]"}`}>
@@ -28,12 +33,12 @@ export function RoomCard({
       <div className="flex flex-1 flex-col gap-2 p-5">
         <h3 className="font-heading text-xl text-ink">{room.name}</h3>
         <p className="text-xs uppercase tracking-label text-brown-600">
-          {room.maxGuests} khách · {room.sizeSqm}m²
+          {dict.common.guests(room.maxGuests)} · {room.sizeSqm}m²
         </p>
         {variant === "default" && <p className="text-sm text-brown-600">{room.description}</p>}
         <div className="mt-2">
           <Button href={`/phong-nghi/${room.hotel}/${room.slug}`} variant="ghost">
-            Xem chi tiết
+            {dict.roomsPage.viewDetails}
           </Button>
         </div>
       </div>

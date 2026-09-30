@@ -1,9 +1,12 @@
+"use client";
+
 import type { ReactElement } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { CornerTagList } from "@/components/ui/CornerTagList";
 import { getPropertyBySlug } from "@/lib/content/properties";
 import type { Offer, OfferBenefit } from "@/lib/types";
+import { useI18n } from "@/lib/i18n/client";
 
 /**
  * OfferCard — ảnh nền cơ sở + chữ/nút đè TRỰC TIẾP lên ảnh (có lớp gradient tối phía
@@ -18,7 +21,8 @@ import type { Offer, OfferBenefit } from "@/lib/types";
  * cầu rõ hơn.
  */
 export function OfferCard({ offer }: { offer: Offer }) {
-  const property = getPropertyBySlug(offer.property);
+  const { locale, dict } = useI18n();
+  const property = getPropertyBySlug(offer.property, locale);
 
   return (
     <article className="relative flex aspect-[3/4] w-full flex-col overflow-hidden rounded-lg md:aspect-[4/5]">
@@ -60,7 +64,7 @@ export function OfferCard({ offer }: { offer: Offer }) {
             ở 768-1024px thẻ vẫn quá hẹp để tag + nút không chồng nhau dù đã thu nhỏ. */}
         <div className="mt-1 flex flex-wrap items-end justify-between gap-3">
           <Button href={`/lien-he?offer=${offer.slug}`} variant="outline" inverse size="sm">
-            KHÁM PHÁ ƯU ĐÃI
+            {dict.offersPage.exploreOffer}
           </Button>
           <CornerTagList lines={offer.tag} className="hidden text-right xl:block" />
         </div>

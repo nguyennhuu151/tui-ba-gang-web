@@ -2,6 +2,16 @@ import { chatbotApiUrl as API_URL } from "@/lib/site";
 
 // Client gọi backend chatbot — port từ chatbot/frontend/lib/chat.ts, giữ nguyên giao thức SSE của backend.
 
+/** Lỗi HTTP từ backend. `message` là thông báo backend trả về (có thể rỗng) — UI tự hiển thị câu lỗi theo ngôn ngữ. */
+export class ChatHttpError extends Error {
+  constructor(
+    readonly status: number,
+    message: string,
+  ) {
+    super(message);
+  }
+}
+
 export type ChatEvent =
   | { type: "session"; sessionId: string }
   | { type: "delta"; text: string }
@@ -27,12 +37,12 @@ export async function streamChat(
   });
 
   if (!res.ok || !res.body) {
-    let msg = `Lỗi máy chủ (${res.status})`;
+    let msg = "";
     try {
       const data = await res.json();
       if (data?.error) msg = data.error;
     } catch {}
-    throw new Error(msg);
+    throw new ChatHttpError(res.status, msg);
   }
 
   const reader = res.body.pipeThrough(new TextDecoderStream()).getReader();

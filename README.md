@@ -14,10 +14,41 @@ npm run dev                  # http://localhost:3000
 
 Chatbot: khi chạy dev, widget chat gọi backend ở `http://localhost:8080` — chạy backend theo `../chatbot/README.md`. Không chạy backend thì widget vẫn hiện nhưng báo "Không kết nối được trợ lý ảo".
 
+## Đa ngôn ngữ (VI/EN)
+
+- URL luôn có tiền tố locale: `/vi/...`, `/en/...` (slug giữ tiếng Việt cho cả 2 bản). Link cũ không có locale (vd. `/phong-nghi`) được `proxy.ts` chuyển hướng: cookie ngôn ngữ đã chọn → ngôn ngữ trình duyệt → `vi`.
+- **Toàn bộ text theo ngôn ngữ nằm trong 2 file:** `lib/i18n/dictionaries/vi.ts` (file gốc) và `lib/i18n/dictionaries/en.ts` (cùng cấu trúc — TypeScript báo lỗi nếu thiếu key).
+- Thêm text mới: thêm key vào cả `vi.ts` và `en.ts`, rồi dùng `const { dict } = await getI18n()` (Server Component) hoặc `const { dict } = useI18n()` (Client Component) → `dict.home.hero.ctaLabel`. Text có giá trị động viết dạng hàm, vd. `dict.common.guests(2)`.
+- `lib/content/*.ts` chỉ giữ phần không phụ thuộc ngôn ngữ (ảnh, icon, slug, liên hệ) và text tiếng Anh dùng chung (tagline thương hiệu, tên hạng phòng, tên ưu đãi...) — hiển thị giống nhau ở cả 2 locale.
+- Link nội bộ: dùng `LocaleLink` / `Button href="/..."` với đường dẫn KHÔNG có locale — locale được tự thêm.
+- Chi tiết: `lib/i18n/`, `claude/phase9-i18n-report.md`.
+
+## Cấu trúc thư mục
+
+| Thư mục | Vai trò |
+|---|---|
+| `app/[locale]/` | Các trang (route). Trang chỉ lấy dữ liệu + ghép section, không chứa dữ liệu cứng. |
+| `components/` | UI dùng lại, chia theo nhóm (`hotel`, `room`, `booking`, `property` — các section của trang cơ sở, `ui`…). |
+| `lib/content/` | Dữ liệu không phụ thuộc ngôn ngữ (cơ sở, phòng, ưu đãi…), ghép text qua `getXxx(locale)`. |
+| `lib/i18n/` | Locale, dictionary `vi.ts`/`en.ts`, helper server/client. |
+| `lib/booking/` | Điểm nối với PMS/ezCloud (`searchAvailability`) — hiện là MOCK. |
+| `tests/` | Test (Vitest): i18n, proxy, tính toàn vẹn nội dung. |
+
+## Thêm / mở một cơ sở mới
+
+1. `lib/types.ts`: thêm slug vào `PropertySlug`.
+2. `lib/content/properties.ts`: thêm dữ liệu gốc (ảnh, icon, liên hệ, `status`, `accent`…).
+3. `lib/i18n/dictionaries/vi.ts` + `en.ts`: thêm `properties.<slug>` (text theo ngôn ngữ).
+4. (Nếu có phòng/ưu đãi) `lib/content/rooms.ts`, `offers.ts` + text tương ứng trong 2 dictionary.
+5. Chạy `npm test` — test báo ngay nếu thiếu text hoặc lệch số phần tử giữa dữ liệu và dictionary.
+
+Mở cửa cơ sở đang "coming soon": chỉ đổi `status: "open"` trong `lib/content/properties.ts`.
+Các trang, menu, sitemap, Header tự cập nhật theo dữ liệu — không cần sửa component.
+
 ## Kiểm tra trước khi merge
 
 ```bash
-npm run check   # lint + typecheck + build — CI (.github/workflows/ci.yml) chạy đúng các bước này
+npm run check   # lint + typecheck + test + build — CI (.github/workflows/ci.yml) chạy đúng các bước này
 ```
 
 ## Deploy (Vercel — xem docs/technical-decisions.md #11)

@@ -1,4 +1,5 @@
 import { Logo } from "@/components/layout/Logo";
+import { getI18n } from "@/lib/i18n/server";
 import { Container } from "@/components/layout/Container";
 import { SocialIcons } from "@/components/footer/SocialIcons";
 
@@ -13,7 +14,9 @@ import { SocialIcons } from "@/components/footer/SocialIcons";
  * nhỏ lại (chỉ ở Footer) cho cân đối với chiều cao mới. Giữ nguyên Logo/SocialIcons/địa
  * điểm — không đổi chức năng, chỉ đổi kích thước/khoảng cách hiển thị.
  */
-export function Footer() {
+export async function Footer() {
+  const { dict } = await getI18n();
+
   return (
     <footer className="bg-brown-900 py-6 text-cream-50">
       <Container className="flex flex-col items-center gap-3 text-center md:flex-row md:justify-between md:text-left">
@@ -22,7 +25,7 @@ export function Footer() {
           <SocialIcons />
           <span className="hidden text-cream-50/40 md:inline">|</span>
           <span className="flex items-center gap-1 text-sm text-cream-50/80">
-            <PinIcon /> ĐÀ LẠT, VIỆT NAM
+            <PinIcon /> {dict.common.dalatVietnam}
           </span>
         </div>
       </Container>

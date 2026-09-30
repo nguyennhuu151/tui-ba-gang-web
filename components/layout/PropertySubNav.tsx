@@ -1,11 +1,14 @@
+"use client";
+
 import { Logo } from "@/components/layout/Logo";
 import { Container } from "@/components/layout/Container";
 import { Button } from "@/components/ui/Button";
 import { TabFilter } from "@/components/navigation/TabFilter";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
-import { properties } from "@/lib/content/properties";
+import { getProperties } from "@/lib/content/properties";
 import { bookingHref } from "@/lib/content/navigation";
 import type { PropertySlug } from "@/lib/types";
+import { useI18n } from "@/lib/i18n/client";
 
 /**
  * PropertySubNav — thay thế Header ở `/thu-vien/:hotel` (CONFIRMED — xem
@@ -14,13 +17,15 @@ import type { PropertySlug } from "@/lib/types";
  * không dùng menu chính."
  */
 export function PropertySubNav({ activeProperty }: { activeProperty: PropertySlug }) {
+  const { locale, dict } = useI18n();
+
   return (
     <header className="sticky top-0 z-30 border-b border-cream-200 bg-cream-50/95 backdrop-blur">
       <Container className="flex min-h-20 flex-wrap items-center justify-between gap-4 py-3 md:h-24 md:flex-nowrap md:py-0">
-        <Logo href="/thu-vien" label="Về trang Thư viện" />
+        <Logo href="/thu-vien" label={dict.nav.backToLibrary} />
         <TabFilter
           activeKey={activeProperty}
-          items={properties.map((p) => ({
+          items={getProperties(locale).map((p) => ({
             key: p.slug,
             label: p.shortName,
             href: `/thu-vien/${p.slug}`,
@@ -28,7 +33,7 @@ export function PropertySubNav({ activeProperty }: { activeProperty: PropertySlu
         />
         <div className="flex items-center gap-5">
           <Button href={bookingHref} className="hidden sm:inline-flex" withArrow>
-            ĐẶT PHÒNG
+            {dict.common.bookNow}
           </Button>
           <div className="hidden lg:block">
             <LanguageSwitcher />

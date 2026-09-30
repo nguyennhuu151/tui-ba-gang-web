@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
-import Link from "next/link";
+import { LocaleLink } from "@/components/navigation/LocaleLink";
+import { useI18n } from "@/lib/i18n/client";
 
 /**
  * Logo — trích xuất từ file `LOGO.pdf` do user cung cấp (thay cho placeholder SVG cũ).
@@ -23,7 +26,7 @@ export function Logo({
   inverse = false,
   className = "h-12 w-auto md:h-16",
   href = "/",
-  label = "Về trang chủ Túi Ba Gang",
+  label,
 }: {
   inverse?: boolean;
   /** Đích khi bấm logo — mặc định về trang chủ (vd. PropertySubNav trỏ về /thu-vien) */
@@ -32,8 +35,14 @@ export function Logo({
   /** Ghi đè kích thước mặc định — vd. dùng bản nhỏ hơn làm badge góc ảnh Hero */
   className?: string;
 }) {
+  const { dict } = useI18n();
+
   return (
-    <Link href={href} className="flex items-center" aria-label={label}>
+    <LocaleLink
+      href={href}
+      className="flex items-center"
+      aria-label={label ?? dict.common.logoLabel}
+    >
       <Image
         src={inverse ? "/logo/logo-lockup-inverse.png" : "/logo/logo-lockup.png"}
         alt="Túi Ba Gang"
@@ -42,6 +51,6 @@ export function Logo({
         priority
         className={className}
       />
-    </Link>
+    </LocaleLink>
   );
 }

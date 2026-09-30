@@ -1,5 +1,8 @@
-import Link from "next/link";
-import { properties } from "@/lib/content/properties";
+"use client";
+
+import { LocaleLink } from "@/components/navigation/LocaleLink";
+import { getProperties } from "@/lib/content/properties";
+import { useLocale } from "@/lib/i18n/client";
 
 /**
  * HeroPropertySelector — 3 số thứ tự (01/02/03) dẫn nhanh tới trang Thư viện
@@ -11,10 +14,12 @@ import { properties } from "@/lib/content/properties";
  * Phase 6.5 mục 4.1.
  */
 export function HeroPropertySelector() {
+  const locale = useLocale();
+
   return (
     <div className="flex flex-wrap gap-8 rounded-md border border-cream-50/30 bg-brown-900/30 px-6 py-4 backdrop-blur-sm">
-      {properties.map((property) => (
-        <Link
+      {getProperties(locale).map((property) => (
+        <LocaleLink
           key={property.slug}
           href={`/thu-vien/${property.slug}`}
           className="group flex flex-col gap-1 text-cream-50"
@@ -25,7 +30,7 @@ export function HeroPropertySelector() {
           <span className="text-sm underline-offset-4 group-hover:underline">
             {property.shortName}
           </span>
-        </Link>
+        </LocaleLink>
       ))}
     </div>
   );

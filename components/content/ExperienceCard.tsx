@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
-import Link from "next/link";
+import { LocaleLink } from "@/components/navigation/LocaleLink";
 import type { ExperienceItem } from "@/lib/types";
+import { useI18n } from "@/lib/i18n/client";
 
 /**
  * ExperienceCard — card giới thiệu trải nghiệm Đà Lạt, dùng ở `/trai-nghiem`.
@@ -17,6 +20,7 @@ export function ExperienceCard({
   item: ExperienceItem;
   index?: number;
 }) {
+  const { dict } = useI18n();
   const number = String(index + 1).padStart(2, "0");
 
   return (
@@ -29,13 +33,13 @@ export function ExperienceCard({
       <div className="flex flex-1 flex-col gap-2 p-5">
         <h3 className="font-heading text-xl text-ink">{item.title}</h3>
         <p className="text-sm text-brown-600">{item.description}</p>
-        <Link
+        <LocaleLink
           href={item.ctaHref ?? `#${item.slug}`}
           className="mt-1 inline-flex w-fit items-center gap-2 text-xs font-medium uppercase tracking-label text-ink underline-offset-4 hover:underline"
         >
-          KHÁM PHÁ
+          {dict.common.explore}
           <span aria-hidden="true">→</span>
-        </Link>
+        </LocaleLink>
       </div>
     </article>
   );

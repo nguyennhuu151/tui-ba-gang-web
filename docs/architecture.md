@@ -161,7 +161,7 @@ Vì **chưa có tài liệu API ezCloud chính thức**, Backend được thiế
 ## 8. Đa ngôn ngữ (Multilingual)
 
 - Route theo locale dạng `/vi/...` và `/en/...` (dùng segment `[locale]` trong App Router), có middleware phát hiện ngôn ngữ trình duyệt để redirect lần đầu, sau đó ghi nhớ lựa chọn của khách (qua cookie).
-- Nội dung dịch được tổ chức theo file JSON/Markdown theo từng locale (`vi/`, `en/`) vì **chưa xác nhận có CMS** (F13 — `open-questions.md`) — nếu sau này có CMS, chỉ cần thay nguồn đọc nội dung, không đổi kiến trúc Frontend.
+- ~~Nội dung dịch được tổ chức theo file JSON/Markdown theo từng locale~~ → **Phase 9:** toàn bộ text theo ngôn ngữ nằm trong `lib/i18n/dictionaries/vi.ts` và `en.ts`; `lib/content` chỉ giữ dữ liệu không phụ thuộc ngôn ngữ (xem `docs/technical-decisions.md` #8). Vẫn **chưa có CMS** (F13) — nếu sau này có CMS, chỉ cần thay nguồn đọc nội dung trong `lib/content`, không đổi kiến trúc Frontend.
 - `LanguageSwitcher` (đã có trong `component-inventory.md`) chuyển giữa 2 locale, giữ nguyên trang đang xem.
 
 ## 9. Responsive

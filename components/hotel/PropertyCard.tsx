@@ -4,18 +4,13 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import type { Property } from "@/lib/types";
+import { useI18n } from "@/lib/i18n/client";
 
 /**
  * PropertyCard — dùng lại ở nhiều trang nhất trong site (Trang chủ, Về chúng tôi,
  * Phòng nghỉ, Thư viện, Trải nghiệm, Liên hệ) — xem docs/ui-component-spec.md mục 3.
  * Accent màu CTA đổi theo cơ sở — xem docs/design-system.md mục 2.2.
  */
-const accentByProperty: Record<Property["slug"], "brown" | "ember" | "littlebay"> = {
-  central: "brown",
-  "ember-style": "ember",
-  "little-bay": "littlebay",
-};
-
 export function PropertyCard({
   property,
   index = 0,
@@ -28,6 +23,8 @@ export function PropertyCard({
   ctaHref?: string;
   ctaLabel?: string;
 }) {
+  const { dict } = useI18n();
+
   return (
     <motion.article
       initial={{ opacity: 0, y: 16 }}
@@ -54,9 +51,9 @@ export function PropertyCard({
           <Button
             href={ctaHref ?? `/thu-vien/${property.slug}`}
             variant="ghost"
-            accent={accentByProperty[property.slug]}
+            accent={property.accent}
           >
-            {ctaLabel ?? `Khám phá ${property.shortName}`}
+            {ctaLabel ?? dict.common.exploreProperty(property.shortName)}
           </Button>
         </div>
       </div>

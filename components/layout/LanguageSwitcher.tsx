@@ -1,42 +1,110 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { locales, type Locale } from "@/lib/i18n/config";
+import { persistLocale, useI18n, usePathnameWithoutLocale } from "@/lib/i18n/client";
+
+const LABELS: Record<Locale, string> = { vi: "Tiếng Việt", en: "English" };
 
 /**
- * LanguageSwitcher — hiện tại là UI PLACEHOLDER, CHƯA có chức năng chuyển ngôn ngữ thật.
- *
- * Lý do: routing đa ngôn ngữ ([locale] + middleware, theo docs/architecture.md mục 8)
- * chưa được implement ở Phase 5 này (phạm vi Phase 5 chỉ là Homepage tiếng Việt).
- * Component này chỉ dựng đúng GIAO DIỆN đã CONFIRMED trong mockup (nút "VI ⌄" ở Header),
- * để không bị thiếu component khi ghép Header — xem báo cáo cuối Phase 5, mục "Chưa implement".
+ * LanguageSwitcher — chuyển VI/EN, giữ nguyên trang đang xem (`/vi/uu-dai` ↔ `/en/uu-dai`)
+ * kèm query/hash. Lựa chọn được lưu vào cookie để lần sau vào `/` (hoặc link không có
+ * locale) `proxy.ts` đưa khách về đúng ngôn ngữ đã chọn.
  *
  * `inverse` — chữ màu sáng khi Header trong suốt, đè trên ảnh hero (Phase 6.5 mục 3).
- * Panel dropdown khi mở vẫn giữ nền đục/chữ tối như cũ để luôn đọc được, bất kể `inverse`.
+ * `variant="inline"` — 2 nút nằm ngang, dùng trong menu mobile.
  */
-export function LanguageSwitcher({ inverse = false }: { inverse?: boolean }) {
+export function LanguageSwitcher({
+  inverse = false,
+  variant = "dropdown",
+}: {
+  inverse?: boolean;
+  variant?: "dropdown" | "inline";
+}) {
+  const { locale, dict } = useI18n();
+  const pathname = usePathnameWithoutLocale();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (e: PointerEvent) => {
+      if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const onKeyDown = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open]);
+
+  function switchTo(next: Locale) {
+    setOpen(false);
+    if (next === locale) return;
+    persistLocale(next);
+    const suffix = pathname === "/" ? "" : pathname;
+    router.push(`/${next}${suffix}${window.location.search}${window.location.hash}`);
+  }
+
+  if (variant === "inline") {
+    return (
+      <div className="flex items-center gap-4 text-sm" role="group" aria-label={dict.language.label}>
+        {locales.map((l) => (
+          <button
+            key={l}
+            type="button"
+            lang={l}
+            onClick={() => switchTo(l)}
+            aria-pressed={l === locale}
+            className={l === locale ? "font-medium text-ink underline underline-offset-4" : "text-brown-600"}
+          >
+            {LABELS[l]}
+          </button>
+        ))}
+      </div>
+    );
+  }
 
   return (
-    <div className="relative">
+    <div ref={rootRef} className="relative">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className={`flex items-center gap-1 text-sm ${inverse ? "text-cream-50" : "text-ink"}`}
+        aria-label={dict.language.choose}
+        className={`flex items-center gap-1 text-sm uppercase ${inverse ? "text-cream-50" : "text-ink"}`}
       >
-        VI
+        {locale}
         <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
           <path d="M2 3.5 5 6.5 8 3.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
         </svg>
       </button>
       {open && (
-        <div className="absolute right-0 top-full z-10 mt-2 min-w-24 rounded-md border border-cream-200 bg-cream-50 py-1 shadow-md">
-          <p className="px-3 py-1.5 text-sm text-ink">VI (hiện tại)</p>
-          <p className="px-3 py-1.5 text-sm text-brown-600">
-            EN — <span className="italic">sắp có</span>
-          </p>
-        </div>
+        <ul
+          role="listbox"
+          aria-label={dict.language.label}
+          className="absolute right-0 top-full z-10 mt-2 min-w-32 rounded-md border border-cream-200 bg-cream-50 py-1 shadow-md"
+        >
+          {locales.map((l) => (
+            <li key={l} role="option" aria-selected={l === locale}>
+              <button
+                type="button"
+                lang={l}
+                onClick={() => switchTo(l)}
+                className={`block w-full px-3 py-1.5 text-left text-sm hover:bg-cream-100 ${
+                  l === locale ? "font-medium text-ink" : "text-brown-600"
+                }`}
+              >
+                {LABELS[l]}
+              </button>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );

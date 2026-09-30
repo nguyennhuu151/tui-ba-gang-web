@@ -1,7 +1,11 @@
+"use client";
+
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { CornerTagList } from "@/components/ui/CornerTagList";
 import type { Property } from "@/lib/types";
+import { useI18n } from "@/lib/i18n/client";
+import { telHref as toTelHref } from "@/lib/phone";
 
 /**
  * ContactCard — ảnh + tên + tagline + hotline + email + CTA, dùng ở `/lien-he`.
@@ -22,26 +26,16 @@ import type { Property } from "@/lib/types";
  * quyết định đã có từ trước, không tự bịa thêm hành vi như mở modal/trang riêng khi
  * chưa có căn cứ) — đảm bảo nút "điều hướng đúng" (bấm được, gọi được ngay).
  */
-export function ContactCard({
-  property,
-  image,
-  description,
-  tags,
-}: {
-  property: Property;
-  image: string;
-  /** Ghi đè `property.tagline` — dùng tagline riêng CONFIRMED cho trang Liên hệ */
-  description?: string;
-  /** Tag nhỏ chữ hoa góc dưới-phải khối chữ (CONFIRMED File B trang 10) */
-  tags?: readonly string[];
-}) {
-  const telHref = `tel:${property.contact.hotline.replace(/\s/g, "")}`;
+/** Ảnh `property.contactImage`, mô tả `property.listingLine`, tag góc dưới-phải `property.tags` (CONFIRMED File B trang 10). */
+export function ContactCard({ property }: { property: Property }) {
+  const { dict } = useI18n();
+  const telHref = toTelHref(property.contact.hotline);
 
   return (
     <article className="flex flex-col overflow-hidden rounded-lg bg-cream-100">
       <div className="relative aspect-[4/3] w-full">
         <Image
-          src={image}
+          src={property.contactImage}
           alt={property.fullName}
           fill
           sizes="(min-width: 768px) 33vw, 100vw"
@@ -55,7 +49,7 @@ export function ContactCard({
           <h3 className="mt-1 font-heading text-2xl text-ink">{property.shortName}</h3>
           <span className="mt-2 block h-px w-6 bg-brown-800/30" />
           <p className="mt-3 font-heading text-base italic leading-snug text-ink">
-            {description ?? property.tagline}
+            {property.listingLine}
           </p>
         </div>
 
@@ -88,9 +82,9 @@ export function ContactCard({
             (đã kiểm tra bằng Playwright, cùng vấn đề chật chỗ ở tablet). */}
         <div className="mt-1 flex flex-wrap items-end justify-between gap-3">
           <Button href={telHref} withArrow size="sm">
-            LIÊN HỆ {property.shortName.toUpperCase()}
+            {dict.contactPage.contactProperty(property.shortName.toUpperCase())}
           </Button>
-          <CornerTagList lines={tags} inverse={false} className="hidden text-right xl:block" />
+          <CornerTagList lines={property.tags} inverse={false} className="hidden text-right xl:block" />
         </div>
       </div>
     </article>

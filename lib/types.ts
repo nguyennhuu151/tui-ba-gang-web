@@ -43,7 +43,25 @@ export interface AmenityItem {
 
 export interface Property {
   slug: PropertySlug;
-  order: "01" | "02" | "03";
+  /** Số thứ tự hiển thị trên card/Hero ("01", "02"...). */
+  order: string;
+  /**
+   * "open" — có landing page và danh sách phòng đầy đủ. "coming-soon" — các trang
+   * `/thu-vien/:hotel`, `/phong-nghi/:hotel(/:room)` hiển thị ComingSoonScreen thay vì nội dung.
+   * Mở cửa 1 cơ sở chỉ cần đổi field này (không phải sửa trang/component nào).
+   */
+  status: "open" | "coming-soon";
+  /** Màu nhấn của cơ sở — khớp token `accent` của components/ui/Button.tsx. */
+  accent: "brown" | "ember" | "littlebay";
+  /** Ảnh dùng ở card Liên hệ và màn hình Coming Soon. */
+  contactImage: string;
+  /**
+   * Dòng mô tả ngắn trên card ở trang Thư viện và Liên hệ — CONFIRMED File B trang 5, 10:
+   * khác `cardDescription` với Little Bay ("A little bay by Túi Ba Gang.").
+   */
+  listingLine: string;
+  /** Nhãn nhỏ phía trên tiêu đề Hero ở `/thu-vien/:hotel` — bỏ trống thì không hiển thị. */
+  heroLocationTag?: string;
   fullName: string;
   shortName: string;
   tagline: string;
@@ -93,6 +111,11 @@ export interface Property {
     subheading: string;
     ctaLabel: string;
     previewCount?: number;
+    /**
+     * Ảnh dùng cho card phòng ở phần preview (lặp vòng nếu ít hơn số phòng) — thay cho ảnh
+     * riêng từng phòng khi ảnh phòng chưa đạt chất lượng hiển thị (Central, Phase 6.8 mục 5.4).
+     */
+    previewImages?: string[];
   };
   moreThanStay?: {
     label: string;

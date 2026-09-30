@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { LocaleLink } from "@/components/navigation/LocaleLink";
 
 /**
  * Breadcrumb — đường dẫn quay lại, dùng ở trang chi tiết hạng phòng
@@ -20,12 +20,12 @@ export function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
         return (
           <span key={`${item.label}-${index}`} className="flex items-center gap-3">
             {item.href && !isLast ? (
-              <Link
+              <LocaleLink
                 href={item.href}
                 className="py-1 leading-6 hover:text-ink hover:underline"
               >
                 {item.label}
-              </Link>
+              </LocaleLink>
             ) : (
               <span
                 aria-current={isLast ? "page" : undefined}

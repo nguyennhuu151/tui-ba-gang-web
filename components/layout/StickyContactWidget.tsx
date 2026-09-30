@@ -1,5 +1,8 @@
 import { ChatWidget } from "@/components/chat/ChatWidget";
 import { chatbotApiUrl } from "@/lib/site";
+import { getI18n } from "@/lib/i18n/server";
+import { brandContact } from "@/lib/content/properties";
+import { telHref } from "@/lib/phone";
 
 /**
  * StickyContactWidget — nút nổi Chat trợ lý ảo + Zalo + gọi điện, góc màn hình.
@@ -7,19 +10,20 @@ import { chatbotApiUrl } from "@/lib/site";
  * Xem docs/component-inventory.md và docs/user-flows.md (Flow G).
  *
  * MOCK / PLACEHOLDER cho Phase 5:
- * - Link Zalo và số điện thoại dùng số hotline CONFIRMED của Central
- *   (0263 383 7837, xem docs/requirements-analysis.md) làm mặc định cho trang chủ,
- *   vì trang chủ đại diện chung cho cả thương hiệu (chưa gắn với 1 cơ sở cụ thể).
+ * - Link Zalo và số điện thoại dùng `brandContact` (hotline CONFIRMED của Central,
+ *   xem lib/content/properties.ts) vì nút này đại diện chung cho cả thương hiệu.
  * - Đây KHÔNG PHẢI tích hợp Zalo OA API — chỉ là deep-link mở Zalo, đúng phạm vi
  *   đã CONFIRMED (xem docs/api-integration-design.md mục 3). Không implement Zalo API thật.
  */
-const HOTLINE = "0263 383 7837";
-const HOTLINE_TEL = "+842633837837";
+const HOTLINE = brandContact.hotline;
+const HOTLINE_TEL = telHref(HOTLINE);
 // Số Zalo thật / OA ID chính thức chưa được cung cấp — đọc từ NEXT_PUBLIC_ZALO_LINK_CENTRAL
 // (xem .env.example), chưa cấu hình thì dùng link tạm trỏ theo số hotline.
-const ZALO_LINK = process.env.NEXT_PUBLIC_ZALO_LINK_CENTRAL || `https://zalo.me/${HOTLINE_TEL}`;
+const ZALO_LINK = process.env.NEXT_PUBLIC_ZALO_LINK_CENTRAL || `https://zalo.me/${HOTLINE_TEL.slice("tel:".length)}`;
 
-export function StickyContactWidget() {
+export async function StickyContactWidget() {
+  const { dict } = await getI18n();
+
   return (
     <div className="fixed bottom-6 right-6 z-40 flex flex-col gap-3">
       {chatbotApiUrl && <ChatWidget />}
@@ -27,14 +31,14 @@ export function StickyContactWidget() {
         href={ZALO_LINK}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Chat Zalo với Túi Ba Gang"
+        aria-label={dict.contactWidget.zalo}
         className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0068FF] text-white shadow-lg transition-transform hover:scale-105"
       >
         <span className="text-xs font-bold">Zalo</span>
       </a>
       <a
-        href={`tel:${HOTLINE_TEL}`}
-        aria-label={`Gọi hotline ${HOTLINE}`}
+        href={HOTLINE_TEL}
+        aria-label={dict.contactWidget.callHotline(HOTLINE)}
         className="flex h-12 w-12 items-center justify-center rounded-full bg-brown-800 text-cream-50 shadow-lg transition-transform hover:scale-105"
       >
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
